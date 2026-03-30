@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OrderFlow"
+            android:textColor="#1A73E8"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome back! Please login to continue."
+            android:textColor="#666666"
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="48dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Email Address"
+            android:textColor="#333333"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etLoginEmail"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="#F5F7FA"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:hint="name@example.com"
+            android:textColorHint="#999999"
+            android:inputType="textEmailAddress"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Password"
+            android:textColor="#333333"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etLoginPassword"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="#F5F7FA"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:hint="••••••••"
+            android:textColorHint="#999999"
+            android:inputType="textPassword"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvLoginMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#E53935"
+            android:textSize="14sp"
+            android:textAlignment="center"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Login"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#1A73E8"
+            android:elevation="2dp"
+            android:layout_marginBottom="32dp"/>
+
+        <TextView
+            android:id="@+id/tvGoToRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Don't have an account? Sign Up"
+            android:textColor="#1A73E8"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:padding="8dp"/>
+
+    </LinearLayout>
+</ScrollView>
