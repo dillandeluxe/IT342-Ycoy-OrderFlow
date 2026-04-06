@@ -1,30 +1,22 @@
-import React, { useState } from 'react'
-import Login from './Login'
-import Register from './Register'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './Login';
+import Register from './Register';
+import Dashboard from './Dashboard'; // The main feature we built!
 
 function App() {
-  const [showLogin, setShowLogin] = useState(true);
-
   return (
-    <div className="App" style={{padding: '20px'}}>
-      <div style={{marginBottom: '20px'}}>
-        <button 
-          onClick={() => setShowLogin(true)}
-          style={{marginRight: '10px', backgroundColor: showLogin ? '#007bff' : '#ccc'}}
-        >
-          Login
-        </button>
-        <button 
-          onClick={() => setShowLogin(false)}
-          style={{backgroundColor: !showLogin ? '#007bff' : '#ccc'}}
-        >
-          Register
-        </button>
-      </div>
-      
-      {showLogin ? <Login /> : <Register />}
-    </div>
-  )
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        
+        {/* If someone just goes to localhost:5173, send them to login */}
+        <Route path="/" element={<Navigate to="/login" />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;

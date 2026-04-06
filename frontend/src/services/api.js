@@ -8,10 +8,17 @@ const api = axios.create({
     }
 });
 
-// Add request interceptor for debugging
+// Add request interceptor for debugging AND attaching JWT token
 api.interceptors.request.use(
     config => {
-        console.log('API Request:', config.method.toUpperCase(), config.url, config.data);
+        // NEW: Grab the token from browser storage
+        const token = localStorage.getItem('token');
+        if (token && token !== 'undefined' && token !== 'null') {
+            // If it exists, attach it to the Authorization header
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        console.log('API Request:', config.method?.toUpperCase(), config.url, config.data);
         return config;
     },
     error => {
@@ -31,5 +38,17 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+// ==========================================
+// API ENDPOINTS
+// ==========================================
+
+// Phase 2: Auth Endpoints
+export const login = (data) => api.post('/auth/login', data);
+export const register = (data) => api.post('/auth/register', data);
+
+// Phase 3: Food Item Endpoints (Seller Dashboard)
+export const getFoodItems = () => api.get('/food');
+export const addFoodItem = (data) => api.post('/food', data);
 
 export default api;

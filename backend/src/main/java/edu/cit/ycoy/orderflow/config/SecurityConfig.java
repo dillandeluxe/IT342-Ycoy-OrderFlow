@@ -29,6 +29,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         })) // Enable CORS with custom configuration
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**").permitAll() // White-lists everything under /api/auth
+            .requestMatchers("/api/food/**").permitAll() // Temporary until JWT/session auth is implemented
             .anyRequest().authenticated()
         );
     
