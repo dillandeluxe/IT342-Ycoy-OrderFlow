@@ -67,8 +67,35 @@ function Login() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: colors.bg, fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
-      
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: colors.bg, backgroundImage: 'radial-gradient(circle at 15% 10%, #E8F1FF 0%, #F4F7FC 55%)', fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
+      <nav
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          backgroundColor: 'rgba(255,255,255,0.92)',
+          backdropFilter: 'blur(8px)',
+          borderBottom: `1px solid ${colors.border}`,
+          padding: '16px 24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
+        <div onClick={() => navigate('/')} style={{ fontSize: '24px', fontWeight: '800', color: colors.primary, letterSpacing: '-0.5px', cursor: 'pointer' }}>
+          OrderFlow
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button style={{ padding: '10px 20px', borderRadius: '30px', border: `1px solid ${colors.border}`, backgroundColor: '#F8FAFC', color: colors.text, fontWeight: '700', cursor: 'default' }}>
+            Sign In
+          </button>
+          <button onClick={() => navigate('/register')} style={{ padding: '10px 20px', borderRadius: '30px', border: 'none', backgroundColor: colors.primary, color: 'white', fontWeight: '700', cursor: 'pointer' }}>
+            Register
+          </button>
+        </div>
+      </nav>
+
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '24px' }}>
       <div style={{ backgroundColor: colors.cardBg, padding: '40px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', border: `1px solid ${colors.border}` }}>
         
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
@@ -138,6 +165,7 @@ function Login() {
             </span>
         </div>
 
+      </div>
       </div>
     </div>
   );
