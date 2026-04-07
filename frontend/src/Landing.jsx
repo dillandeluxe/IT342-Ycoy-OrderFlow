@@ -156,7 +156,7 @@ function Landing() {
                             fontWeight: 800
                         }}
                     >
-                        Food delivery, elevated.
+                        Food delivery, Elevated.
                     </h1>
 
                     <p
