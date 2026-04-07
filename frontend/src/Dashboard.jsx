@@ -5,8 +5,14 @@ import { getFoodItems, addFoodItem, updateFoodItem, deleteFoodItem } from './ser
 function Dashboard() {
     const [foodItems, setFoodItems] = useState([]);
     
-    // NEW: Added 'stock' to the form data state
-    const [formData, setFormData] = useState({ name: '', description: '', price: '', stock: '' });
+    // NEW: Added 'category' to the form data state
+    const [formData, setFormData] = useState({ 
+        name: '', 
+        description: '', 
+        price: '', 
+        stock: '',
+        category: 'Uncategorized' 
+    });
     
     const [message, setMessage] = useState('');
     const [activeTab, setActiveTab] = useState('Dashboard'); 
@@ -17,6 +23,9 @@ function Dashboard() {
     
     const navigate = useNavigate();
 
+    // The categories that map perfectly to the BuyerDashboard tabs
+    const categoryOptions = ['Pizza', 'Burgers', 'Rice Meals', 'Drinks', 'Desserts', 'Uncategorized'];
+
     useEffect(() => {
         fetchItems();
     }, []);
@@ -26,7 +35,6 @@ function Dashboard() {
             const response = await getFoodItems();
             const currentSellerId = localStorage.getItem('userId');
             
-            // Filter the database using the new strict ERD seller_id!
             const myMenu = response.data.filter(item => 
                 item.seller && item.seller.id.toString() === currentSellerId
             );
@@ -69,9 +77,10 @@ function Dashboard() {
                 description: formData.description,
                 price: parsedPrice,
                 stock: parsedStock,
-                category: "Uncategorized", 
+                // NEW: Use the dynamic category from the form instead of hardcoding
+                category: formData.category, 
                 imageUrl: "",
-               seller: { id: sellerId }
+                seller: { id: sellerId }
             };
             
             if (editingId) {
@@ -83,8 +92,8 @@ function Dashboard() {
                 setMessage('Food item added successfully!');
             }
             
-            // NEW: Reset stock field as well
-            setFormData({ name: '', description: '', price: '', stock: '' }); 
+            // NEW: Reset category field as well
+            setFormData({ name: '', description: '', price: '', stock: '', category: 'Uncategorized' }); 
             fetchItems(); 
             setTimeout(() => setMessage(''), 3000); 
         } catch (error) {
@@ -96,12 +105,13 @@ function Dashboard() {
 
     const handleEditClick = (item) => {
         setEditingId(item.id);
-        // NEW: Populate stock when editing
+        // NEW: Populate category when editing
         setFormData({
             name: item.name,
             description: item.description,
             price: item.price,
-            stock: item.stock || 0
+            stock: item.stock || 0,
+            category: item.category || 'Uncategorized'
         });
         setActiveTab('Products');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -109,8 +119,8 @@ function Dashboard() {
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        // NEW: Reset stock field
-        setFormData({ name: '', description: '', price: '', stock: '' });
+        // NEW: Reset category field
+        setFormData({ name: '', description: '', price: '', stock: '', category: 'Uncategorized' });
     };
 
     const triggerDelete = (id) => {
@@ -273,36 +283,54 @@ function Dashboard() {
                                 </div>
                             )}
 
-                            {/* NEW: Expanded Grid layout to fit the new Stock column seamlessly */}
-                            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: editingId ? '1.5fr 2fr 0.8fr 0.8fr auto auto' : '1.5fr 2fr 0.8fr 0.8fr auto', gap: '16px', alignItems: 'end' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Item Name</label>
-                                    <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Cheeseburger" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Description</label>
-                                    <input type="text" name="description" value={formData.description} onChange={handleChange} required placeholder="Ingredients, flavor, etc." style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Price ($)</label>
-                                    <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required placeholder="0.00" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
-                                </div>
+                            {/* NEW: Split form into two rows to prevent UI crunching */}
+                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 
-                                {/* NEW: Stock Input Box */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Stock</label>
-                                    <input type="number" name="stock" value={formData.stock} onChange={handleChange} required placeholder="Quantity" min="0" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
+                                {/* Row 1: Name & Description */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '16px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Item Name</label>
+                                        <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Cheeseburger" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Description</label>
+                                        <input type="text" name="description" value={formData.description} onChange={handleChange} required placeholder="Ingredients, flavor, etc." style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
+                                    </div>
                                 </div>
 
-                                <button type="submit" style={{ padding: '0 24px', backgroundColor: editingId ? '#F57C00' : colors.primary, color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', height: '43px', transition: 'background-color 0.2s', fontSize: '14px' }}>
-                                    {editingId ? 'Update Item' : 'Save Item'}
-                                </button>
-                                
-                                {editingId && (
-                                    <button type="button" onClick={handleCancelEdit} style={{ padding: '0 24px', backgroundColor: '#F5F5F5', color: '#757575', border: '1px solid #CCC', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', height: '43px', fontSize: '14px' }}>
-                                        Cancel
+                                {/* Row 2: Category, Price, Stock, Buttons */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr auto auto', gap: '16px', alignItems: 'end' }}>
+                                    
+                                    {/* NEW: Category Dropdown */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Category</label>
+                                        <select name="category" value={formData.category} onChange={handleChange} required style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF', cursor: 'pointer' }}>
+                                            {categoryOptions.map(cat => (
+                                                <option key={cat} value={cat}>{cat}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Price ($)</label>
+                                        <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required placeholder="0.00" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Stock</label>
+                                        <input type="number" name="stock" value={formData.stock} onChange={handleChange} required placeholder="Quantity" min="0" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
+                                    </div>
+
+                                    <button type="submit" style={{ padding: '0 24px', backgroundColor: editingId ? '#F57C00' : colors.primary, color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', height: '43px', transition: 'background-color 0.2s', fontSize: '14px' }}>
+                                        {editingId ? 'Update Item' : 'Save Item'}
                                     </button>
-                                )}
+                                    
+                                    {editingId && (
+                                        <button type="button" onClick={handleCancelEdit} style={{ padding: '0 24px', backgroundColor: '#F5F5F5', color: '#757575', border: '1px solid #CCC', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', height: '43px', fontSize: '14px' }}>
+                                            Cancel
+                                        </button>
+                                    )}
+                                </div>
                             </form>
                         </div>
 
@@ -316,8 +344,9 @@ function Dashboard() {
                                     <tr style={{ borderBottom: `2px solid ${colors.border}` }}>
                                         <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Name</th>
                                         <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Description</th>
+                                        {/* NEW: Category Column Header */}
+                                        <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Category</th>
                                         <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Price</th>
-                                        {/* NEW: Stock Column Header */}
                                         <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase', textAlign: 'center' }}>Stock</th>
                                         <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase', textAlign: 'center' }}>Actions</th>
                                     </tr>
@@ -325,7 +354,7 @@ function Dashboard() {
                                 <tbody>
                                     {foodItems.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: colors.textLight, fontStyle: 'italic' }}>
+                                            <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: colors.textLight, fontStyle: 'italic' }}>
                                                 Your menu is empty. Add items above to see them here!
                                             </td>
                                         </tr>
@@ -334,9 +363,14 @@ function Dashboard() {
                                             <tr key={item.id} style={{ borderBottom: `1px solid ${colors.border}`, backgroundColor: editingId === item.id ? '#FFF8E1' : 'transparent' }}>
                                                 <td style={{ padding: '16px 24px', fontWeight: '600', color: colors.text }}>{item.name}</td>
                                                 <td style={{ padding: '16px 24px', color: colors.textLight, fontSize: '14px' }}>{item.description}</td>
+                                                
+                                                {/* NEW: Category Data Cell */}
+                                                <td style={{ padding: '16px 24px', color: colors.primary, fontSize: '13px', fontWeight: '600' }}>
+                                                    {item.category || 'Uncategorized'}
+                                                </td>
+
                                                 <td style={{ padding: '16px 24px', fontWeight: '700', color: '#2E7D32' }}>${item.price.toFixed(2)}</td>
                                                 
-                                                {/* NEW: Stock Data Cell - Changes color if stock is low! */}
                                                 <td style={{ padding: '16px 24px', fontWeight: '700', textAlign: 'center', color: item.stock <= 5 ? '#D32F2F' : colors.text }}>
                                                     {item.stock} {item.stock <= 5 && '⚠️'}
                                                 </td>
