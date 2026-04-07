@@ -4,14 +4,15 @@ import { getFoodItems, addFoodItem, updateFoodItem, deleteFoodItem } from './ser
 
 function Dashboard() {
     const [foodItems, setFoodItems] = useState([]);
-    const [formData, setFormData] = useState({ name: '', description: '', price: '' });
+    
+    // NEW: Added 'stock' to the form data state
+    const [formData, setFormData] = useState({ name: '', description: '', price: '', stock: '' });
+    
     const [message, setMessage] = useState('');
     const [activeTab, setActiveTab] = useState('Dashboard'); 
     
     const [editingId, setEditingId] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false); 
-    
-    // NEW: State for the modern custom delete modal
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, itemId: null });
     
     const navigate = useNavigate();
@@ -23,12 +24,12 @@ function Dashboard() {
     const fetchItems = async () => {
         try {
             const response = await getFoodItems();
+            const currentSellerId = localStorage.getItem('userId');
             
-            // NEW BUG FIX: Get the currently logged-in seller's name
-            const currentSeller = localStorage.getItem('restaurantName') || 'Local Restaurant';
-            
-            // Filter the database so this seller ONLY sees their own food!
-            const myMenu = response.data.filter(item => item.sellerName === currentSeller);
+            // Filter the database using the new strict ERD seller_id!
+            const myMenu = response.data.filter(item => 
+                item.seller && item.seller.id.toString() === currentSellerId
+            );
             
             setFoodItems(myMenu);
         } catch (error) {
@@ -43,12 +44,34 @@ function Dashboard() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-           const savedName = localStorage.getItem('restaurantName') || 'Local Restaurant';
+            const savedId = localStorage.getItem('userId');
+            const sellerId = Number(savedId);
+            const parsedPrice = parseFloat(formData.price);
+            const parsedStock = parseInt(formData.stock, 10);
+
+            if (!Number.isInteger(sellerId) || sellerId <= 0) {
+                setMessage('Error adding food item: missing seller ID. Please log in again.');
+                return;
+            }
+
+            if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+                setMessage('Error adding food item: price must be a valid non-negative number.');
+                return;
+            }
+
+            if (!Number.isInteger(parsedStock) || parsedStock < 0) {
+                setMessage('Error adding food item: stock must be a valid non-negative whole number.');
+                return;
+            }
 
             const payload = {
-                ...formData,
-                price: parseFloat(formData.price),
-                sellerName: savedName 
+                name: formData.name,
+                description: formData.description,
+                price: parsedPrice,
+                stock: parsedStock,
+                category: "Uncategorized", 
+                imageUrl: "",
+               seller: { id: sellerId }
             };
             
             if (editingId) {
@@ -60,21 +83,25 @@ function Dashboard() {
                 setMessage('Food item added successfully!');
             }
             
-            setFormData({ name: '', description: '', price: '' }); 
+            // NEW: Reset stock field as well
+            setFormData({ name: '', description: '', price: '', stock: '' }); 
             fetchItems(); 
             setTimeout(() => setMessage(''), 3000); 
         } catch (error) {
-            setMessage(`Error ${editingId ? 'updating' : 'adding'} food item. Check console.`);
+            const backendError = error.response?.data?.error || error.response?.data?.message;
+            setMessage(backendError || `Error ${editingId ? 'updating' : 'adding'} food item. Check console.`);
             console.error(error);
         }
     };
 
     const handleEditClick = (item) => {
         setEditingId(item.id);
+        // NEW: Populate stock when editing
         setFormData({
             name: item.name,
             description: item.description,
-            price: item.price
+            price: item.price,
+            stock: item.stock || 0
         });
         setActiveTab('Products');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -82,34 +109,34 @@ function Dashboard() {
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        setFormData({ name: '', description: '', price: '' });
+        // NEW: Reset stock field
+        setFormData({ name: '', description: '', price: '', stock: '' });
     };
 
-    // NEW: Open the modern modal instead of the ugly browser alert
     const triggerDelete = (id) => {
         setDeleteModal({ isOpen: true, itemId: id });
     };
 
-    // NEW: Actually execute the delete when they confirm on the modern modal
     const executeDelete = async () => {
         if (!deleteModal.itemId) return;
         
         try {
             await deleteFoodItem(deleteModal.itemId);
             setMessage('Food item deleted successfully!');
-            setDeleteModal({ isOpen: false, itemId: null }); // Close modal
+            setDeleteModal({ isOpen: false, itemId: null }); 
             fetchItems();
             setTimeout(() => setMessage(''), 3000);
         } catch (error) {
             setMessage('Error deleting food item.');
             console.error(error);
-            setDeleteModal({ isOpen: false, itemId: null }); // Close modal on error too
+            setDeleteModal({ isOpen: false, itemId: null }); 
         }
     };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('restaurantName'); // Clear name on logout
+        localStorage.removeItem('restaurantName');
+        localStorage.removeItem('userId');
         navigate('/login');
     };
 
@@ -246,7 +273,8 @@ function Dashboard() {
                                 </div>
                             )}
 
-                            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: editingId ? '1.5fr 2fr 1fr auto auto' : '1.5fr 2fr 1fr auto', gap: '16px', alignItems: 'end' }}>
+                            {/* NEW: Expanded Grid layout to fit the new Stock column seamlessly */}
+                            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: editingId ? '1.5fr 2fr 0.8fr 0.8fr auto auto' : '1.5fr 2fr 0.8fr 0.8fr auto', gap: '16px', alignItems: 'end' }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Item Name</label>
                                     <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Cheeseburger" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
@@ -259,6 +287,13 @@ function Dashboard() {
                                     <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Price ($)</label>
                                     <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required placeholder="0.00" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
                                 </div>
+                                
+                                {/* NEW: Stock Input Box */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Stock</label>
+                                    <input type="number" name="stock" value={formData.stock} onChange={handleChange} required placeholder="Quantity" min="0" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
+                                </div>
+
                                 <button type="submit" style={{ padding: '0 24px', backgroundColor: editingId ? '#F57C00' : colors.primary, color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', height: '43px', transition: 'background-color 0.2s', fontSize: '14px' }}>
                                     {editingId ? 'Update Item' : 'Save Item'}
                                 </button>
@@ -282,13 +317,15 @@ function Dashboard() {
                                         <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Name</th>
                                         <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Description</th>
                                         <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Price</th>
+                                        {/* NEW: Stock Column Header */}
+                                        <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase', textAlign: 'center' }}>Stock</th>
                                         <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase', textAlign: 'center' }}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {foodItems.length === 0 ? (
                                         <tr>
-                                            <td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: colors.textLight, fontStyle: 'italic' }}>
+                                            <td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: colors.textLight, fontStyle: 'italic' }}>
                                                 Your menu is empty. Add items above to see them here!
                                             </td>
                                         </tr>
@@ -298,11 +335,16 @@ function Dashboard() {
                                                 <td style={{ padding: '16px 24px', fontWeight: '600', color: colors.text }}>{item.name}</td>
                                                 <td style={{ padding: '16px 24px', color: colors.textLight, fontSize: '14px' }}>{item.description}</td>
                                                 <td style={{ padding: '16px 24px', fontWeight: '700', color: '#2E7D32' }}>${item.price.toFixed(2)}</td>
+                                                
+                                                {/* NEW: Stock Data Cell - Changes color if stock is low! */}
+                                                <td style={{ padding: '16px 24px', fontWeight: '700', textAlign: 'center', color: item.stock <= 5 ? '#D32F2F' : colors.text }}>
+                                                    {item.stock} {item.stock <= 5 && '⚠️'}
+                                                </td>
+
                                                 <td style={{ padding: '16px 24px', textAlign: 'center' }}>
                                                     <button onClick={() => handleEditClick(item)} style={{ background: '#E3F2FD', border: 'none', color: '#1976D2', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', marginRight: '8px', fontSize: '12px', fontWeight: '600' }}>
                                                         Edit
                                                     </button>
-                                                    {/* NEW: Triggers the sleek custom modal instead of window.confirm */}
                                                     <button onClick={() => triggerDelete(item.id)} style={{ background: '#FFEBEE', border: 'none', color: '#D32F2F', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}>
                                                         Delete
                                                     </button>
@@ -325,7 +367,7 @@ function Dashboard() {
 
             </div>
 
-            {/* --- NEW: MODERN DELETE CONFIRMATION MODAL --- */}
+            {/* DELETE CONFIRMATION MODAL */}
             {deleteModal.isOpen && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, backdropFilter: 'blur(2px)' }}>
                     <div style={{ backgroundColor: 'white', padding: '32px', borderRadius: '16px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', border: '1px solid #F1F5F9' }}>

@@ -39,7 +39,10 @@ public ResponseEntity<?> login(@RequestBody LoginDto dto) {
             "message", "Login successful!",
             "email", user.getEmail(),
             "fullName", user.getFullName(),
-            "role", user.getRole()
+            "role", user.getRole(),
+            "id", user.getId()
+            
+            
         ));
     } catch (RuntimeException e) {
         return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

@@ -18,13 +18,18 @@ function Login() {
 
     try {
       const res = await login({ email, password });
+
+      if (res.data?.id) {
+        localStorage.setItem('userId', String(res.data.id));
+      }
+      if (res.data?.fullName) {
+        localStorage.setItem('restaurantName', res.data.fullName);
+      }
       
       if (res.data?.token) {
         localStorage.setItem('token', res.data.token);
-        localStorage.setItem('restaurantName', res.data.fullName);
       } else {
        localStorage.removeItem('token');
-        localStorage.removeItem('restaurantName');
       }
 
       // SMART ROUTING: Check the role and send them to the correct dashboard!

@@ -37,7 +37,22 @@ function BuyerDashboard() {
         );
     };
 
-    const categories = ['All', 'Pizza', 'Burgers', 'Rice Meals', 'Drinks', 'Desserts'];
+    // NEW: Smart filtering logic for Categories and Search Bar
+    const filteredItems = foodItems.filter(item => {
+        // 1. Filter by Category
+        const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
+        
+        // 2. Filter by Search Query (checks name, description, and restaurant)
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+            item.name?.toLowerCase().includes(query) || 
+            item.description?.toLowerCase().includes(query) ||
+            getRestaurantName(item).toLowerCase().includes(query);
+
+        return matchesCategory && matchesSearch;
+    });
+
+    const categories = ['All', 'Pizza', 'Burgers', 'Rice Meals', 'Drinks', 'Desserts', 'Uncategorized'];
 
     const colors = {
         primary: '#1A73E8',     
@@ -148,26 +163,35 @@ function BuyerDashboard() {
                 {/* Food Grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
                     
-                    {foodItems.length === 0 ? (
+                    {/* NEW: Use the filteredItems array instead of all foodItems */}
+                    {filteredItems.length === 0 ? (
                         <div style={{ gridColumn: '1 / -1', padding: '60px', textAlign: 'center', backgroundColor: colors.cardBg, borderRadius: '16px', border: `2px dashed ${colors.border}` }}>
-                            <h3 style={{ color: colors.textLight, margin: 0 }}>No food items available right now.</h3>
-                            <p style={{ color: colors.textLight, fontSize: '14px' }}>Sellers are preparing their menus!</p>
+                            <h3 style={{ color: colors.textLight, margin: 0 }}>No meals found.</h3>
+                            <p style={{ color: colors.textLight, fontSize: '14px' }}>Try adjusting your search or category filter!</p>
                         </div>
                     ) : (
-                        foodItems.map(item => (
-                            <div key={item.id} style={{ backgroundColor: colors.cardBg, borderRadius: '16px', overflow: 'hidden', border: `1px solid ${colors.border}`, transition: 'transform 0.2s', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+                        filteredItems.map(item => (
+                            <div key={item.id} style={{ backgroundColor: colors.cardBg, borderRadius: '16px', overflow: 'hidden', border: `1px solid ${colors.border}`, transition: 'transform 0.2s', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', position: 'relative' }}>
                                 
+                                {/* NEW: SOLD OUT Badge */}
+                                {item.stock === 0 && (
+                                    <div style={{ position: 'absolute', top: '12px', right: '12px', backgroundColor: '#D32F2F', color: 'white', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '800', letterSpacing: '1px', zIndex: 10 }}>
+                                        SOLD OUT
+                                    </div>
+                                )}
+
+                                {/* NEW: Uses item.imageUrl if it exists, otherwise falls back to placeholder */}
                                 <div style={{ 
                                     height: '180px', 
-                                    backgroundImage: 'url("https://placehold.co/600x400/E3F2FD/1A73E8?text=Delicious+Food&font=Montserrat")',
+                                    backgroundImage: `url("${item.imageUrl && item.imageUrl.trim() !== "" ? item.imageUrl : 'https://placehold.co/600x400/E3F2FD/1A73E8?text=Delicious+Food&font=Montserrat'}")`,
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center',
-                                    borderBottom: `1px solid ${colors.border}`
+                                    borderBottom: `1px solid ${colors.border}`,
+                                    opacity: item.stock === 0 ? 0.6 : 1 // Dims the image if sold out
                                 }}></div>
 
-                                <div style={{ padding: '20px' }}>
+                                <div style={{ padding: '20px', opacity: item.stock === 0 ? 0.6 : 1 }}>
                                     
-                                    {/* NEW: Seller / Restaurant Name Badge */}
                                     <div style={{ fontSize: '12px', fontWeight: '700', color: colors.primary, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
                                     {getRestaurantName(item)}
                                     </div>
@@ -186,10 +210,22 @@ function BuyerDashboard() {
                                     </p>
 
                                     <button 
-                                        style={{ width: '100%', padding: '12px', backgroundColor: '#F1F5F9', color: '#94A3B8', border: 'none', borderRadius: '8px', fontWeight: '600', fontSize: '14px', cursor: 'not-allowed' }}
-                                        title="Checkout will be available in Phase 5"
+                                        style={{ 
+                                            width: '100%', 
+                                            padding: '12px', 
+                                            backgroundColor: item.stock === 0 ? '#F1F5F9' : '#E3F2FD', 
+                                            color: item.stock === 0 ? '#94A3B8' : colors.primary, 
+                                            border: 'none', 
+                                            borderRadius: '8px', 
+                                            fontWeight: '700', 
+                                            fontSize: '14px', 
+                                            cursor: item.stock === 0 ? 'not-allowed' : 'pointer',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        disabled={item.stock === 0}
+                                        title={item.stock === 0 ? "Item out of stock" : "Checkout will be available in Phase 5"}
                                     >
-                                        Add to Cart (Coming Soon)
+                                        {item.stock === 0 ? "Out of Stock" : "Add to Cart (Coming Soon)"}
                                     </button>
                                 </div>
                             </div>
