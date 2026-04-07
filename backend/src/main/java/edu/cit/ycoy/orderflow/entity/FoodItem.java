@@ -19,6 +19,9 @@ public class FoodItem {
     @Column(nullable = false)
     private BigDecimal price;
 
+    @Column(name = "seller_name")
+    private String sellerName;
+
     private boolean isAvailable = true;
 
     // Default Constructor
@@ -39,4 +42,7 @@ public class FoodItem {
     
     public boolean isAvailable() { return isAvailable; }
     public void setAvailable(boolean available) { isAvailable = available; }
+
+    public String getSellerName() { return sellerName; }
+    public void setSellerName(String sellerName) { this.sellerName = sellerName; }
 }

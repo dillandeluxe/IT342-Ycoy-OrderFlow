@@ -5,10 +5,14 @@ import { register } from './services/api';
 function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState(''); // <-- NEW STATE
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [role] = useState('SELLER'); 
+  const [role, setRole] = useState('SELLER'); // NEW: Role is now a state variable
   
+  // NEW: State for showing/hiding passwords
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
   
@@ -19,11 +23,10 @@ function Register() {
     setMessage('');
     setIsError(false);
     
-    // --- NEW: Password Match Validation ---
     if (password !== confirmPassword) {
         setIsError(true);
         setMessage("Registration Failed: Passwords do not match.");
-        return; // Stop the function here so it doesn't call the API
+        return; 
     }
     
     try {
@@ -67,7 +70,8 @@ function Register() {
         
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <h1 style={{ color: colors.primary, margin: '0 0 8px 0', fontSize: '28px', letterSpacing: '1px' }}>OrderFlow</h1>
-            <p style={{ color: colors.textLight, margin: 0, fontSize: '15px' }}>Register Seller Account</p>
+            {/* NEW: Updated to a Motto */}
+            <p style={{ color: colors.textLight, margin: 0, fontSize: '15px' }}>Your ultimate food ordering companion.</p>
         </div>
 
         {message && (
@@ -78,11 +82,32 @@ function Register() {
 
         <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
+          {/* NEW: Role Selection Buttons */}
+          <div style={{ display: 'flex', gap: '10px', backgroundColor: '#FAFAFA', padding: '6px', borderRadius: '8px', border: `1px solid ${colors.border}` }}>
+              <button 
+                type="button" 
+                onClick={() => setRole('SELLER')}
+                style={{ flex: 1, padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s', backgroundColor: role === 'SELLER' ? colors.primary : 'transparent', color: role === 'SELLER' ? 'white' : colors.textLight }}
+              >
+                  Seller
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setRole('BUYER')}
+                style={{ flex: 1, padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s', backgroundColor: role === 'BUYER' ? colors.primary : 'transparent', color: role === 'BUYER' ? 'white' : colors.textLight }}
+              >
+                  Buyer
+              </button>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Restaurant Name / Full Name</label>
+              {/* NEW: Label changes based on Role */}
+              <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>
+                  {role === 'SELLER' ? 'Restaurant Name' : 'Full Name'}
+              </label>
               <input 
                 type="text" 
-                placeholder="Enter Your Restaurant Name" 
+                placeholder={role === 'SELLER' ? "Enter your restaurant name" : "Enter your full name"} 
                 value={fullName}
                 onChange={e => setFullName(e.target.value)} 
                 required 
@@ -91,10 +116,10 @@ function Register() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Admin Email</label>
+              <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Email Address</label>
               <input 
                 type="email" 
-                placeholder="Enter Your Email" 
+                placeholder="Enter your email" 
                 value={email}
                 onChange={e => setEmail(e.target.value)} 
                 required 
@@ -102,29 +127,46 @@ function Register() {
               />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* NEW: Password with Eye Toggle */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
               <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Password</label>
-              <input 
-                type="password" 
-                placeholder="Enter your password" 
-                value={password}
-                onChange={e => setPassword(e.target.value)} 
-                required 
-                style={{ padding: '14px', border: `1px solid ${colors.border}`, borderRadius: '8px', outline: 'none', fontSize: '15px', backgroundColor: '#FAFAFA' }}
-              />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="Enter your password" 
+                    value={password}
+                    onChange={e => setPassword(e.target.value)} 
+                    required 
+                    style={{ width: '100%', padding: '14px', paddingRight: '45px', border: `1px solid ${colors.border}`, borderRadius: '8px', outline: 'none', fontSize: '15px', backgroundColor: '#FAFAFA', boxSizing: 'border-box' }}
+                  />
+                  <span 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    style={{ position: 'absolute', right: '14px', cursor: 'pointer', fontSize: '18px', userSelect: 'none' }}
+                  >
+                      {showPassword ? '⌣' : '👁'}
+                  </span>
+              </div>
           </div>
 
-          {/* --- NEW: Confirm Password Input --- */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* NEW: Confirm Password with Eye Toggle */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
               <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Confirm Password</label>
-              <input 
-                type="password" 
-                placeholder="Re-enter your password" 
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)} 
-                required 
-                style={{ padding: '14px', border: `1px solid ${colors.border}`, borderRadius: '8px', outline: 'none', fontSize: '15px', backgroundColor: '#FAFAFA' }}
-              />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input 
+                    type={showConfirmPassword ? "text" : "password"} 
+                    placeholder="Re-enter your password" 
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)} 
+                    required 
+                    style={{ width: '100%', padding: '14px', paddingRight: '45px', border: `1px solid ${colors.border}`, borderRadius: '8px', outline: 'none', fontSize: '15px', backgroundColor: '#FAFAFA', boxSizing: 'border-box' }}
+                  />
+                  <span 
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
+                    style={{ position: 'absolute', right: '14px', cursor: 'pointer', fontSize: '18px', userSelect: 'none' }}
+                  >
+                      {showConfirmPassword ? '⌣' : '👁'}
+                  </span>
+              </div>
           </div>
 
           <button 
@@ -141,7 +183,7 @@ function Register() {
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
             <span 
                 onClick={() => navigate('/login')} 
-                style={{ color: colors.primary, fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
+                style={{ color: colors.primary, fontSize: '14px', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}
             >
                 Already have an account? Sign In
             </span>

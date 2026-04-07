@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './Login';
 import Register from './Register';
 import Dashboard from './Dashboard'; // The main feature we built!
+import BuyerDashboard from './BuyerDashboard';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
         
         {/* If someone just goes to localhost:5173, send them to login */}
         <Route path="/" element={<Navigate to="/login" />} />

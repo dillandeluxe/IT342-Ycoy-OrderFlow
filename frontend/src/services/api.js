@@ -50,5 +50,7 @@ export const register = (data) => api.post('/auth/register', data);
 // Phase 3: Food Item Endpoints (Seller Dashboard)
 export const getFoodItems = () => api.get('/food');
 export const addFoodItem = (data) => api.post('/food', data);
+export const updateFoodItem = (id, foodItem) => axios.put(`${API_URL}/food/${id}`, foodItem);
+export const deleteFoodItem = (id) => axios.delete(`${API_URL}/food/${id}`);
 
 export default api;

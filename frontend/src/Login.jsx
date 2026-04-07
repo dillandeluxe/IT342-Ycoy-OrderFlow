@@ -5,6 +5,7 @@ import { login } from './services/api';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // NEW: State for eye toggle
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false); 
   
@@ -17,21 +18,22 @@ function Login() {
 
     try {
       const res = await login({ email, password });
-      const userRole = res.data.role; 
-
+      
       if (res.data?.token) {
         localStorage.setItem('token', res.data.token);
+        localStorage.setItem('restaurantName', res.data.fullName);
       } else {
-        localStorage.removeItem('token');
+       localStorage.removeItem('token');
+        localStorage.removeItem('restaurantName');
       }
 
-      if (userRole === 'SELLER') {
+      // SMART ROUTING: Check the role and send them to the correct dashboard!
+      if (res.data.role === 'SELLER') {
           navigate('/dashboard'); 
-      } else if (userRole === 'BUYER') {
-          setIsError(true);
-          setMessage("Access Denied: As a Buyer, please use the OrderFlow Mobile App to place orders.");
+      } else if (res.data.role === 'BUYER') {
+          navigate('/buyer-dashboard'); 
       } else {
-          navigate('/dashboard'); 
+          navigate('/dashboard'); // Fallback just in case
       }
 
     } catch (err) {
@@ -66,7 +68,8 @@ function Login() {
         
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <h1 style={{ color: colors.primary, margin: '0 0 8px 0', fontSize: '28px', letterSpacing: '1px' }}>OrderFlow</h1>
-            <p style={{ color: colors.textLight, margin: 0, fontSize: '15px' }}>Seller Administration Portal</p>
+            {/* NEW: Updated to match the motto from Register */}
+            <p style={{ color: colors.textLight, margin: 0, fontSize: '15px' }}>Your ultimate food ordering companion.</p>
         </div>
 
         {message && (
@@ -89,16 +92,25 @@ function Login() {
               />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* NEW: Password with Eye Toggle */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
               <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Password</label>
-              <input 
-                type="password" 
-                placeholder="Enter your password" 
-                value={password}
-                onChange={e => setPassword(e.target.value)} 
-                required 
-                style={{ padding: '14px', border: `1px solid ${colors.border}`, borderRadius: '8px', outline: 'none', fontSize: '15px', backgroundColor: '#FAFAFA' }}
-              />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="Enter your password" 
+                    value={password}
+                    onChange={e => setPassword(e.target.value)} 
+                    required 
+                    style={{ width: '100%', padding: '14px', paddingRight: '45px', border: `1px solid ${colors.border}`, borderRadius: '8px', outline: 'none', fontSize: '15px', backgroundColor: '#FAFAFA', boxSizing: 'border-box' }}
+                  />
+                  <span 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    style={{ position: 'absolute', right: '14px', cursor: 'pointer', fontSize: '18px', userSelect: 'none' }}
+                  >
+                      {showPassword ? '⌣' : '👁'}
+                  </span>
+              </div>
           </div>
 
           <button 
@@ -107,16 +119,15 @@ function Login() {
             onMouseOver={(e) => e.target.style.backgroundColor = '#1557B0'}
             onMouseOut={(e) => e.target.style.backgroundColor = colors.primary}
           >
-            Sign In to Dashboard
+            Sign In
           </button>
 
         </form>
 
-        {/* --- NEW REGISTER LINK ADDED HERE --- */}
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
             <span 
                 onClick={() => navigate('/register')} 
-                style={{ color: colors.primary, fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
+                style={{ color: colors.primary, fontSize: '14px', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}
             >
                 Don't have an account? Register here
             </span>
