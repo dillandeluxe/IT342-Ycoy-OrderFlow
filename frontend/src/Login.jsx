@@ -99,7 +99,7 @@ function Login() {
       <div style={{ backgroundColor: colors.cardBg, padding: '40px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', border: `1px solid ${colors.border}` }}>
         
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h1 style={{ color: colors.primary, margin: '0 0 8px 0', fontSize: '28px', letterSpacing: '1px' }}>OrderFlow</h1>
+          <h1 style={{ color: colors.primary, margin: '0 0 8px 0', fontSize: '28px', fontWeight: '800', letterSpacing: '-0.5px' }}>OrderFlow</h1>
             {/* NEW: Updated to match the motto from Register */}
             <p style={{ color: colors.textLight, margin: 0, fontSize: '15px' }}>Your ultimate food ordering companion.</p>
         </div>
