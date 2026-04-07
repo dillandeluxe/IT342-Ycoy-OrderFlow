@@ -160,6 +160,12 @@ function Dashboard() {
         border: '#E2E8F0'       
     };
 
+    const formatPeso = (value) =>
+        new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP'
+        }).format(Number(value || 0));
+
     return (
         <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'Inter', 'Segoe UI', sans-serif", backgroundColor: colors.bg, position: 'relative' }}>
             
@@ -245,7 +251,7 @@ function Dashboard() {
                             </div>
                             <div style={{ backgroundColor: colors.cardBg, padding: '24px', borderRadius: '12px', border: `1px solid ${colors.border}`, boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
                                 <div style={{ color: colors.textLight, fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Total Revenue</div>
-                                <div style={{ color: colors.text, fontSize: '36px', fontWeight: 'bold' }}>$0.00</div>
+                                <div style={{ color: colors.text, fontSize: '36px', fontWeight: 'bold' }}>{formatPeso(0)}</div>
                                 <div style={{ color: colors.textLight, fontSize: '13px', marginTop: '8px', fontWeight: '500' }}>Lifetime earnings</div>
                             </div>
                         </div>
@@ -312,7 +318,7 @@ function Dashboard() {
                                     </div>
 
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Price ($)</label>
+                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Price (PHP)</label>
                                         <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required placeholder="0.00" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
                                     </div>
                                     
@@ -369,7 +375,7 @@ function Dashboard() {
                                                     {item.category || 'Uncategorized'}
                                                 </td>
 
-                                                <td style={{ padding: '16px 24px', fontWeight: '700', color: '#2E7D32' }}>${item.price.toFixed(2)}</td>
+                                                <td style={{ padding: '16px 24px', fontWeight: '700', color: '#2E7D32' }}>{formatPeso(item.price)}</td>
                                                 
                                                 <td style={{ padding: '16px 24px', fontWeight: '700', textAlign: 'center', color: item.stock <= 5 ? '#D32F2F' : colors.text }}>
                                                     {item.stock} {item.stock <= 5 && '⚠️'}

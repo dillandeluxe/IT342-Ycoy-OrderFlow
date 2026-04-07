@@ -64,6 +64,12 @@ function BuyerDashboard() {
         accent: '#F59E0B' 
     };
 
+    const formatPeso = (value) =>
+        new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP'
+        }).format(Number(value || 0));
+
     return (
         <div style={{ minHeight: '100vh', backgroundColor: colors.bg, fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
             
@@ -201,7 +207,7 @@ function BuyerDashboard() {
                                             {item.name}
                                         </h3>
                                         <span style={{ backgroundColor: '#E8F5E9', color: '#2E7D32', padding: '4px 8px', borderRadius: '8px', fontWeight: '700', fontSize: '14px' }}>
-                                            ${item.price.toFixed(2)}
+                                            {formatPeso(item.price)}
                                         </span>
                                     </div>
                                     
