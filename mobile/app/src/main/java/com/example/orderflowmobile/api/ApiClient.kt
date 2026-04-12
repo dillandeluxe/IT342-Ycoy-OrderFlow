@@ -1,6 +1,6 @@
-package edu.cit.ycoy.orderflowmobile.api
+package com.example.orderflowmobile.api
 
-import com.example.orderflowmobile.api.AuthApi
+
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -14,5 +14,13 @@ object ApiClient {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(AuthApi::class.java)
+    }
+
+    val foodService: FoodApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(FoodApi::class.java)
     }
 }

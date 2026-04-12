@@ -7,7 +7,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import edu.cit.ycoy.orderflowmobile.api.ApiClient
+import com.example.orderflowmobile.api.ApiClient
 import com.example.orderflowmobile.api.LoginRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,17 +54,30 @@ class LoginActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
                         btnLogin.isEnabled = true
-                        if (response.isSuccessful) {
+
+                        // Check if successful AND if the body contains data
+                        if (response.isSuccessful && response.body() != null) {
+                            val loginData = response.body()!!
+
+                            // ==========================================
+                            // NEW: THE ROLE GATEKEEPER
+                            // ==========================================
+                            if (loginData.role.uppercase() == "SELLER") {
+                                tvMessage.text = "Sellers must use the Web Dashboard. Please log in on the Web."
+                                tvMessage.setTextColor(android.graphics.Color.RED)
+                                return@withContext // Stops the code here, preventing them from entering!
+                            }
+
+                            // If they are a BUYER, proceed normally
                             tvMessage.text = "Login Successful!"
                             tvMessage.setTextColor(android.graphics.Color.GREEN)
                             Toast.makeText(this@LoginActivity, "Welcome!", Toast.LENGTH_SHORT).show()
 
-                            // --- ADD THESE 4 LINES ---
+                            // Navigate to Dashboard
                             val intent = Intent(this@LoginActivity, DashboardActivity::class.java)
                             intent.putExtra("USER_EMAIL", email) // Pass their email to the dashboard
                             startActivity(intent)
                             finish()
-                            // Later: Navigate to the Dashboard/Home Activity here
 
                         } else {
                             tvMessage.text = "Invalid email or password"
