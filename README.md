@@ -1,149 +1,108 @@
 # OrderFlow
 
-OrderFlow is a multi-platform food ordering system with a shared backend and two client applications.
+OrderFlow is a food ordering platform built for both web and mobile users, powered by one shared backend API.
 
-This README is refactored to follow the SDD structure in [docs/SDD_OrderFlow_Ycoy.docx.pdf](docs/SDD_OrderFlow_Ycoy.docx.pdf).
+It is designed around two core roles:
+- Buyer: signs in, browses available food items, and places orders.
+- Seller: signs in and manages food listings through create, update, and delete actions.
 
-## 1.0 Introduction
+## What The App Does
 
-### 1.1 Stakeholders
+OrderFlow solves a common restaurant workflow problem: managing menus and customer ordering in one connected system.
 
-- Buyer (Customer): Browses available food items and places orders.
-- Seller (Restaurant Administrator): Manages food items and availability.
+The app provides:
+- Authentication for account registration and login
+- Role-based usage flow for buyers and sellers
+- Food item management for sellers
+- A shared API consumed by both web and Android clients
 
-### 1.2 System Overview
+## User Experience Flow
 
-OrderFlow consists of:
-- Backend API: Spring Boot REST service with authentication, authorization, and persistence.
-- Web App: React + Vite client for browser-based access.
-- Android App: Kotlin client for mobile access.
+### Buyer Journey
 
-## Included Features
+1. Register or log in.
+2. Browse available food items.
+3. Select items and proceed with ordering flow.
+
+### Seller Journey
+
+1. Register or log in.
+2. Open dashboard.
+3. Add new food items.
+4. Edit or delete existing listings.
+
+## App Surfaces
+
+- Web client in [frontend](frontend): Browser-based experience using React.
+- Android client in [mobile](mobile): Native mobile experience using Kotlin.
+- Backend service in [backend](backend): Central API, authentication, and data layer.
+
+## Core Features
 
 - User registration and login
-- JWT-based authentication for secured requests
-- Food item CRUD operations for sellers
-- Shared API consumption across web and mobile clients
+- JWT-based authentication for protected requests
+- Food item CRUD operations
+- Unified backend consumed by web and mobile
 
-## Excluded Features
-
-- Online payment gateway integration
-- Real-time delivery tracking
-- Production-grade cloud deployment automation
-
-## 2.0 Functional Requirements Specification
-
-- Account Management
-  - Register new users
-  - Authenticate existing users
-- Food Management
-  - Create food items
-  - View food items
-  - Update food items
-  - Delete food items
-- API Access Control
-  - Attach and validate JWT for protected endpoints
-
-## 3.0 Non-Functional Requirements
-
-- Performance: Responsive API and UI interactions for common user actions.
-- Security: Token-based authentication and protected backend routes.
-- Reliability: Stable CRUD operations with persistent database storage.
-- Maintainability: Layered backend structure and separated frontend/mobile clients.
-
-## 4.0 System Architecture
-
-### Major Components
-
-- frontend/: React web application
-- backend/: Spring Boot REST API
-- mobile/: Android Kotlin application
-- PostgreSQL: Primary relational database
-
-### Component Interaction
-
-- Web and mobile clients send HTTP requests to backend endpoints.
-- Backend validates auth, processes business logic, and persists data.
-- Backend returns JSON responses to both clients.
-
-### Technology Stack
+## Tech Stack
 
 - Backend: Java 17, Spring Boot 3, Spring Security, Spring Data JPA, Maven
-- Database: PostgreSQL (primary), H2 dependency available
+- Database: PostgreSQL
 - Frontend: React 19, Vite, Axios, React Router
 - Mobile: Android (Kotlin), Retrofit, Coroutines
 
-## 5.0 API Contract and Communication
+## Project Structure
 
-Base URL (local): `http://localhost:8080/api`
+```text
+IT342-Ycoy-OrderFlow/
+|-- backend/    # Spring Boot REST API
+|-- frontend/   # React web app
+`-- mobile/     # Android app
+```
 
-### Authentication Endpoints
+## Quick Start
 
-- `POST /auth/register` - User Registration
-- `POST /auth/login` - User Login
-
-### Food Endpoints
-
-- `GET /food`
-- `POST /food`
-- `PUT /food/{id}`
-- `DELETE /food/{id}`
-
-### HTTP Status Codes
-
-- `200` / `201` for successful operations
-- `400` for invalid request data
-- `401` / `403` for authentication or authorization failures
-- `404` for not found resources
-- `500` for server errors
-
-### Common Error Codes
-
-- `INVALID_CREDENTIALS`
-- `UNAUTHORIZED`
-- `VALIDATION_ERROR`
-- `RESOURCE_NOT_FOUND`
-
-## 6.0 Database Design
-
-Current persistence uses PostgreSQL via Spring Data JPA.
-
-Core entities implemented in code include:
-- User/account data
-- Food item data
-
-For schema details, refer to backend entity classes under [backend/src/main/java](backend/src/main/java).
-
-## 7.0 UI/UX Design
-
-- Web UI is implemented with React components in [frontend/src](frontend/src).
-- Mobile UI is implemented in Android modules under [mobile/app/src/main](mobile/app/src/main).
-- UX goal: simple role-based flows for authentication and food management.
-
-## 8.0 Plan
-
-The SDD plan outlines phased delivery:
-- Phase 1: Planning and Design (Week 1-2)
-- Phase 2: Backend Development (Week 3-4)
-- Phase 3: Web Application (Week 5-6)
-- Phase 4: Mobile Application (Week 7-8)
-- Phase 5: Integration and Deployment (Week 9-10)
-
-## Setup and Run Guide
-
-## Prerequisites
+### Prerequisites
 
 - Java 17+
-- Maven 3.9+ (or Maven Wrapper)
 - Node.js 20+ and npm
-- Android Studio
-- PostgreSQL database
+- Android Studio (for mobile)
+- PostgreSQL
 
-## Environment Setup
+### 1. Run Backend
 
-Update backend configuration to use environment variables instead of hardcoded secrets in [backend/src/main/resources/application.properties](backend/src/main/resources/application.properties).
+```powershell
+cd backend
+./mvnw spring-boot:run
+```
 
-Suggested properties:
+Backend runs on http://localhost:8080
+
+### 2. Run Frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs on http://localhost:5173
+
+The frontend API base is set to http://localhost:8080/api in [frontend/src/services/api.js](frontend/src/services/api.js).
+
+### 3. Run Mobile
+
+1. Open [mobile](mobile) in Android Studio.
+2. Sync Gradle.
+3. Build and run on emulator/device.
+
+For Android emulator local API calls, use 10.0.2.2 instead of localhost.
+
+## Environment Configuration
+
+Configure database credentials in [backend/src/main/resources/application.properties](backend/src/main/resources/application.properties).
+
+Recommended pattern:
 
 ```properties
 server.port=8080
@@ -165,36 +124,16 @@ $env:DB_USERNAME="postgres"
 $env:DB_PASSWORD="your_password"
 ```
 
-## Run Locally
+## API Endpoints Used By Clients
 
-### Backend
+- POST /api/auth/register
+- POST /api/auth/login
+- GET /api/food
+- POST /api/food
+- PUT /api/food/{id}
+- DELETE /api/food/{id}
 
-```powershell
-cd backend
-./mvnw spring-boot:run
-```
-
-Backend URL: `http://localhost:8080`
-
-### Frontend
-
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend URL: `http://localhost:5173`
-
-### Mobile
-
-1. Open [mobile](mobile) in Android Studio.
-2. Sync Gradle.
-3. Run on emulator or physical device.
-
-If testing against local backend from Android emulator, use `10.0.2.2` instead of `localhost`.
-
-## Build and Test Commands
+## Build Commands
 
 ### Backend
 
@@ -222,18 +161,14 @@ cd mobile
 
 ## Troubleshooting
 
-- Backend DB connection failure:
-  - Verify `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
-  - Ensure PostgreSQL is running and reachable.
-- Frontend cannot call backend:
-  - Verify backend is active on port `8080`.
-- Invalid npm command:
-  - Use `npm run dev` (not `npm rundev`).
+- If backend cannot connect to DB, verify DB_URL, DB_USERNAME, and DB_PASSWORD.
+- If frontend cannot reach API, make sure backend is running on port 8080.
+- If dev command fails, use npm run dev (not npm rundev).
 
-## Security Reminder
+## Security Note
 
-Do not commit real passwords, tokens, or production secrets to source control.
+Do not commit real passwords, tokens, or production credentials.
 
 ## Contributors
 
-Developed for IT342 OrderFlow project.
+Developed for the IT342 OrderFlow project.
