@@ -14,7 +14,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
     return (
         <aside className="sidebar">
             <div className="sidebar-logo">
-                <span style={{ marginRight: '8px' }}>🧑‍🍳</span> OrderFlow
+                <span style={{ marginRight: '8px' }}></span> OrderFlow
             </div>
             <nav className="sidebar-nav">
                 {tabs.map(tab => (
