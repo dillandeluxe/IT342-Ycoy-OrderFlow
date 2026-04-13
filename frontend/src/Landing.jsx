@@ -1,316 +1,165 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './Landing.css';
+
+// Sub-components
+const Navbar = ({ isScrolled, onLogin, onRegister }) => (
+    <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+        <div className="nav-logo">
+            <span className="logo-icon"></span> OrderFlow
+        </div>
+        <div className="nav-actions">
+            <button className="btn btn-text" onClick={onLogin}>Log In</button>
+            <button className="btn btn-primary" onClick={onRegister}>Sign Up</button>
+        </div>
+    </nav>
+);
+
+const SearchBar = ({ onFindFood }) => (
+    <div className="search-wrapper fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <div className="search-container">
+            <span className="search-pin">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+            </span>
+            <input 
+                type="text" 
+                className="search-input" 
+                placeholder="Enter your delivery address" 
+            />
+            <button className="btn btn-primary search-btn" onClick={onFindFood}>
+                Find Food
+            </button>
+        </div>
+        <p className="search-hint">Sign in to see nearby restaurants and exclusive offers.</p>
+    </div>
+);
+
+const Categories = ({ onCategoryClick }) => {
+    const cats = [
+        { icon: '🍕', label: 'Pizza' },
+        { icon: '🍔', label: 'Burgers' },
+        { icon: '🥗', label: 'Healthy' },
+        { icon: '🍣', label: 'Asian' },
+        { icon: '☕', label: 'Cafe' },
+        { icon: '🍰', label: 'Desserts' },
+    ];
+    return (
+        <div className="categories-section fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <h3 className="categories-title">Popular top categories</h3>
+            <div className="categories-scroll">
+                {cats.map(c => (
+                    <div key={c.label} className="category-pill" onClick={onCategoryClick}>
+                        <div className="category-icon">{c.icon}</div>
+                        <span>{c.label}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const HeroSection = ({ onFindFood }) => (
+    <section className="hero-section">
+        <div className="hero-content">
+            <h1 className="hero-title fade-in-up">
+                Hungry? <br/>
+                <span className="text-highlight">You're in the right place.</span>
+            </h1>
+            <p className="hero-subtitle fade-in-up" style={{ animationDelay: '0.1s' }}>
+                Get your favorite meals from local restaurants delivered to your door at lightning speed.
+            </p>
+            <SearchBar onFindFood={onFindFood} />
+            <Categories onCategoryClick={onFindFood} />
+        </div>
+        <div className="hero-image-container fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <img 
+                src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1024&q=80" 
+                alt="Delicious food display" 
+                className="hero-img"
+            />
+            <div className="floating-card card-1">
+                <span className="float-icon">🚚</span> Fast Delivery
+            </div>
+            <div className="floating-card card-2">
+                ⭐ 4.9 Top Rated
+            </div>
+        </div>
+    </section>
+);
+
+const HowItWorks = () => {
+    const steps = [
+        { icon: '📱', title: '1. Browse & Order', text: 'Select from a wide variety of local restaurants.' },
+        { icon: '🧑‍🍳', title: '2. They Prepare', text: 'Chefs prepare your meal with love and care.' },
+        { icon: '🛵', title: '3. Fast Delivery', text: 'Your food is delivered hot and fresh to your door.' }
+    ];
+
+    return (
+        <section className="how-it-works">
+            <h2 className="section-title">How OrderFlow Works</h2>
+            <div className="steps-grid">
+                {steps.map((step, idx) => (
+                    <div key={idx} className="step-card">
+                        <div className="step-icon">{step.icon}</div>
+                        <h3 className="step-title">{step.title}</h3>
+                        <p className="step-text">{step.text}</p>
+                    </div>
+                ))}
+            </div>
+        </section>
+    );
+};
+
+const SellerCta = ({ onRegister }) => (
+    <section className="seller-cta">
+        <div className="seller-content">
+            <h2>Partner with OrderFlow</h2>
+            <p>Join thousands of restaurants reaching more customers every day. Setup is fast and easy.</p>
+            <button className="btn btn-outline-white" onClick={onRegister}>Become a Partner</button>
+        </div>
+    </section>
+);
+
+const Footer = () => (
+    <footer className="landing-footer">
+        <div className="footer-content">
+            <div className="footer-brand">
+                <h3>OrderFlow</h3>
+                <p>Delivering happiness to your doorstep.</p>
+            </div>
+            <div className="footer-links">
+                <span>© {new Date().getFullYear()} OrderFlow. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+);
 
 function Landing() {
     const navigate = useNavigate();
-    const [isCompact, setIsCompact] = useState(window.innerWidth < 900);
+    const [isScrolled, setIsScrolled] = useState(false);
 
     useEffect(() => {
-        const onResize = () => setIsCompact(window.innerWidth < 900);
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
+        const onScroll = () => setIsScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', onScroll);
+        return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
-    const colors = {
-        primary: '#1A73E8',
-        bg: '#F8FAFC',
-        cardBg: '#FFFFFF',
-        text: '#1E293B',
-        textLight: '#64748B',
-        border: '#E2E8F0',
-        accent: '#F59E0B'
-    };
-
-    const fontFamily = "'Inter', 'Segoe UI', sans-serif";
-
-    const experienceItems = [
-        {
-            icon: '✨',
-            title: 'Curated Discovery',
-            text: 'Browse premium local favorites, from comfort classics to trending new kitchens.'
-        },
-        {
-            icon: '🛵',
-            title: 'Reliable Delivery Flow',
-            text: 'Transparent timing and smooth order progression keep every meal experience stress-free.'
-        },
-        {
-            icon: '🍽️',
-            title: 'Restaurant-First Tools',
-            text: 'Sellers manage menus and inventory in a polished dashboard built for daily operations.'
-        }
-    ];
-
-
     return (
-        <div
-            style={{
-                minHeight: '100vh',
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: colors.bg,
-                backgroundImage: 'radial-gradient(circle at 15% 10%, #E8F1FF 0%, #F8FAFC 55%)',
-                fontFamily
-            }}
-        >
-            <nav
-                style={{
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 100,
-                    backgroundColor: 'rgba(255,255,255,0.92)',
-                    backdropFilter: 'blur(8px)',
-                    borderBottom: `1px solid ${colors.border}`,
-                    padding: isCompact ? '14px 16px' : '16px 40px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    transition: 'padding 0.28s ease'
-                }}
-            >
-                <div style={{ fontSize: '24px', fontWeight: '800', color: colors.primary, letterSpacing: '-0.5px' }}>
-                    OrderFlow
-                </div>
-
-                <div style={{ display: 'flex', gap: '12px' }}>
-                    <button
-                        onClick={() => navigate('/login')}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = '#F8FAFC';
-                            e.currentTarget.style.transform = 'translateY(-1px)';
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.cardBg;
-                            e.currentTarget.style.transform = 'translateY(0)';
-                        }}
-                        style={{
-                            padding: '10px 20px',
-                            borderRadius: '30px',
-                            border: `1px solid ${colors.border}`,
-                            backgroundColor: colors.cardBg,
-                            color: colors.text,
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease'
-                        }}
-                    >
-                        Sign In
-                    </button>
-                    <button
-                        onClick={() => navigate('/register')}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = '#1557B0';
-                            e.currentTarget.style.transform = 'translateY(-1px)';
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = colors.primary;
-                            e.currentTarget.style.transform = 'translateY(0)';
-                        }}
-                        style={{
-                            padding: '10px 20px',
-                            borderRadius: '30px',
-                            border: 'none',
-                            backgroundColor: colors.primary,
-                            color: '#FFFFFF',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
-                            transition: 'all 0.2s ease'
-                        }}
-                    >
-                        Register
-                    </button>
-                </div>
-            </nav>
-
-            <main
-                style={{
-                    maxWidth: '1120px',
-                    margin: '0 auto',
-                    width: '100%',
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    padding: isCompact ? '30px 16px 0 16px' : '44px 20px 0 20px',
-                    transition: 'padding 0.28s ease'
-                }}
-            >
-                <section
-                    style={{
-                        background: `linear-gradient(145deg, ${colors.cardBg} 0%, #F7FAFF 100%)`,
-                        borderRadius: '32px',
-                        boxShadow: '0 20px 40px rgba(0,0,0,0.04)',
-                        padding: isCompact ? '42px 18px' : '80px 28px',
-                        textAlign: 'center',
-                        marginBottom: '24px',
-                        transition: 'padding 0.28s ease, margin 0.28s ease'
-                    }}
-                >
-                    <h1
-                        style={{
-                            margin: 0,
-                            color: colors.primary,
-                            fontSize: isCompact ? '38px' : '56px',
-                            lineHeight: 1.05,
-                            letterSpacing: '-1px',
-                            fontWeight: 800
-                        }}
-                    >
-                        Food delivery, Elevated.
-                    </h1>
-
-                    <p
-                        style={{
-                            margin: '18px auto 0 auto',
-                            maxWidth: '760px',
-                            color: colors.textLight,
-                            fontSize: isCompact ? '16px' : '19px',
-                            lineHeight: 1.6
-                        }}
-                    >
-                        A premium ordering experience for hungry customers and ambitious local restaurants.
-                        Discover standout meals, place orders faster, and grow your reach with confidence.
-                    </p>
-
-                    <div
-                        style={{
-                            marginTop: '30px',
-                            marginLeft: 'auto',
-                            marginRight: 'auto',
-                            maxWidth: '780px',
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: '50px',
-                            boxShadow: '0 20px 40px rgba(0,0,0,0.04)',
-                            padding: isCompact ? '10px' : '12px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            flexDirection: isCompact ? 'column' : 'row'
-                        }}
-                    >
-                        <input
-                            type="text"
-                            placeholder="Search restaurants, dishes, or cuisines"
-                            onFocus={(e) => {
-                                e.currentTarget.style.outline = 'none';
-                            }}
-                            style={{
-                                flex: 1,
-                                width: '100%',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                outline: 'none',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: colors.text
-                            }}
-                        />
-                        <button
-                            onClick={() => navigate('/login')}
-                            onMouseOver={(e) => {
-                                e.currentTarget.style.backgroundColor = '#1557B0';
-                                e.currentTarget.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseOut={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.primary;
-                                e.currentTarget.style.transform = 'translateY(0)';
-                            }}
-                            style={{
-                                border: 'none',
-                                borderRadius: '50px',
-                                backgroundColor: colors.primary,
-                                color: '#FFFFFF',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                padding: '12px 22px',
-                                transition: 'all 0.2s ease',
-                                minWidth: isCompact ? '100%' : 'auto'
-                            }}
-                        >
-                            Find Food
-                        </button>
-                    </div>
-                </section>
-
-                <section
-                    style={{
-                        minHeight: 'auto',
-                        display: 'flex',
-                        alignItems: 'stretch',
-                        marginTop: 'auto',
-                        width: '100vw',
-                        marginLeft: 'calc(50% - 50vw)',
-                        marginRight: 'calc(50% - 50vw)',
-                        backgroundColor: '#FFFFFF',
-                        boxShadow: '0 20px 40px rgba(0,0,0,0.04)',
-                        padding: isCompact ? '34px 20px' : '42px 20px',
-                        marginBottom: '0'
-                    }}
-                >
-                    <div style={{ maxWidth: '1120px', margin: '0 auto', width: '100%' }}>
-                        <h2
-                            style={{
-                                margin: 0,
-                                textAlign: 'center',
-                                color: colors.primary,
-                                fontWeight: 800,
-                                fontSize: isCompact ? '34px' : '44px',
-                                letterSpacing: '-0.6px'
-                            }}
-                        >
-                            The OrderFlow experience
-                        </h2>
-                        <p
-                            style={{
-                                margin: '14px auto 0 auto',
-                                maxWidth: '700px',
-                                textAlign: 'center',
-                                color: colors.textLight,
-                                fontSize: '17px',
-                                lineHeight: 1.6
-                            }}
-                        >
-                            A refined ordering journey designed for speed, confidence, and delightful food discovery.
-                        </p>
-
-                        <div
-                            style={{
-                                marginTop: '32px',
-                                display: 'grid',
-                                gridTemplateColumns: isCompact ? '1fr' : 'repeat(3, 1fr)',
-                                gap: '32px'
-                            }}
-                        >
-                            {experienceItems.map((item) => (
-                                <div key={item.title} style={{ padding: '8px 6px' }}>
-                                    <div style={{ fontSize: '40px', marginBottom: '18px' }}>{item.icon}</div>
-                                    <h3 style={{ margin: '0 0 10px 0', color: colors.text, fontSize: '24px', fontWeight: 800 }}>
-                                        {item.title}
-                                    </h3>
-                                    <p style={{ margin: 0, color: colors.textLight, fontSize: '16px', lineHeight: 1.7 }}>
-                                        {item.text}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
+        <div className="landing-container">
+            <Navbar 
+                isScrolled={isScrolled} 
+                onLogin={() => navigate('/login')} 
+                onRegister={() => navigate('/register')} 
+            />
+            <main className="landing-main">
+                <HeroSection onFindFood={() => navigate('/login')} />
+                <HowItWorks />
+                <SellerCta onRegister={() => navigate('/register')} />
             </main>
-
-            <footer
-                style={{
-                    marginTop: 0,
-                    padding: '18px 24px',
-                    textAlign: 'center',
-                    color: colors.textLight,
-                    fontSize: '14px',
-                    borderTop: `1px solid ${colors.border}`,
-                    backgroundColor: colors.cardBg
-                }}
-            >
-                © {new Date().getFullYear()} OrderFlow. All rights reserved.
-            </footer>
+            <Footer />
         </div>
     );
 }

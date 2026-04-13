@@ -16,7 +16,9 @@ const OAuth2RedirectHandler = () => {
             // Save to localStorage just like your regular login does
             localStorage.setItem('userEmail', email);
             localStorage.setItem('userRole', role);
-            localStorage.setItem('userName', fullName);
+            
+            // FIXED: Changed 'userName' to 'fullName' so the Dashboard can find it!
+            localStorage.setItem('fullName', fullName); 
             
             // Redirect to the Seller Dashboard
             navigate('/dashboard');
@@ -28,7 +30,8 @@ const OAuth2RedirectHandler = () => {
 
     return (
         <div style={{ textAlign: 'center', marginTop: '50px' }}>
-            <h2>Logging you in securely with GitHub...</h2>
+            {/* FIXED: Made this generic since it handles both Google and GitHub now */}
+            <h2>Authenticating your account securely...</h2>
         </div>
     );
 };

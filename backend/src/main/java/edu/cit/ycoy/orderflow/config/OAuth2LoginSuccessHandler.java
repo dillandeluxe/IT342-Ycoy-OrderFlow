@@ -36,7 +36,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             user.setEmail(email);
             user.setFullName(oAuth2User.getAttribute("name") != null ? oAuth2User.getAttribute("name") : username);
             user.setRole("SELLER"); // Default role
-            user.setPasswordHash("OAUTH2_GITHUB_LOGIN");
+            user.setPasswordHash("OAUTH2_PROVIDED_ACCOUNT");
             userRepository.save(user);
         } else {
             user = existingUser.get();

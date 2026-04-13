@@ -1,11 +1,256 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getFoodItems, addFoodItem, updateFoodItem, deleteFoodItem } from './services/api';
+import './Dashboard.css';
+
+// --- Subcomponents ---
+
+const Sidebar = ({ activeTab, setActiveTab }) => {
+    const tabs = [
+        { id: 'Dashboard', icon: '📊' },
+        { id: 'Products', icon: '🍔' },
+        { id: 'Orders', icon: '📦' }
+    ];
+    return (
+        <aside className="sidebar">
+            <div className="sidebar-logo">
+                <span style={{ marginRight: '8px' }}>🧑‍🍳</span> OrderFlow
+            </div>
+            <nav className="sidebar-nav">
+                {tabs.map(tab => (
+                    <div 
+                        key={tab.id}
+                        className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
+                        onClick={() => setActiveTab(tab.id)}
+                    >
+                        <span style={{ fontSize: '18px', opacity: activeTab === tab.id ? 1 : 0.7 }}>{tab.icon}</span> 
+                        {tab.id}
+                    </div>
+                ))}
+            </nav>
+        </aside>
+    );
+};
+
+const Header = ({ activeTab, userName, showDropdown, setShowDropdown, handleLogout }) => (
+    <header className="top-header">
+        <div className="header-title">
+            <h1>{activeTab} Management</h1>
+            <p>Manage your restaurant's {activeTab.toLowerCase()} and settings.</p>
+        </div>
+        <div className="user-dropdown-container">
+            <div className="user-trigger" onClick={() => setShowDropdown(!showDropdown)}>
+                <div className="user-avatar">
+                    {userName.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <span className="user-name">{userName} ▼</span>
+            </div>
+            {showDropdown && (
+                <div className="dropdown-menu">
+                    <div className="dropdown-item" onClick={handleLogout}>Log Out</div>
+                </div>
+            )}
+        </div>
+    </header>
+);
+
+const StatCard = ({ icon, title, value, subtext, subtextColor = 'var(--text-light)' }) => (
+    <div className="stat-card">
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div className="stat-title" style={{ marginBottom: 0 }}>{title}</div>
+            {icon && <div style={{ fontSize: '24px', opacity: 0.9, backgroundColor: 'var(--primary-light)', color: 'var(--primary)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px' }}>{icon}</div>}
+        </div>
+        <div className="stat-value">{value}</div>
+        <div className="stat-sub" style={{ color: subtextColor }}>{subtext}</div>
+    </div>
+);
+
+const DashboardHome = ({ userName, foodItems, formatPeso, setActiveTab }) => (
+    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="welcome-banner">
+            <h2>Welcome back, {userName}! 👋</h2>
+            <p>Here is what's happening with your restaurant today.</p>
+        </div>
+
+        <div className="stats-grid">
+            <StatCard 
+                icon="🍽️"
+                title="Total Menu Items" 
+                value={foodItems.length} 
+                subtext="↑ Live from Database" 
+                subtextColor="var(--success)" 
+            />
+            <StatCard 
+                icon="🔔"
+                title="Pending Orders" 
+                value="0" 
+                subtext="Waiting for Phase 4 App" 
+                subtextColor="var(--primary)" 
+            />
+            <StatCard 
+                icon="📈"
+                title="Total Revenue" 
+                value={formatPeso(0)} 
+                subtext="Lifetime earnings" 
+            />
+        </div>
+
+        <div className="action-banner">
+            <div>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', color: 'var(--text)' }}>Prepare for Mobile Launch</h3>
+                <p style={{ margin: 0, color: 'var(--text-light)', fontSize: '14px', maxWidth: '600px', lineHeight: '1.5' }}>
+                    Your menu currently has <strong>{foodItems.length} items</strong>. Ensure your menu is populated before the mobile application goes live.
+                </p>
+            </div>
+            <button className="btn btn-light" onClick={() => setActiveTab('Products')}>
+                Manage Products ➔
+            </button>
+        </div>
+    </div>
+);
+
+const ProductForm = ({ formData, handleChange, handleSubmit, editingId, handleCancelEdit, message, categoryOptions }) => {
+    const isEditing = !!editingId;
+    return (
+        <div className={`form-card fade-in ${isEditing ? 'editing' : ''}`}>
+            <h2 style={{ margin: '0 0 20px 0', fontSize: '18px', color: isEditing ? '#D97706' : 'var(--primary)' }}>
+                {isEditing ? '✏️ Edit Menu Item' : '+ Add New Menu Item'}
+            </h2>
+            
+            {message && (
+                <div className={`alert-message ${message.includes('Error') ? 'alert-error' : 'alert-success'}`} style={{ backgroundColor: message.includes('Error') ? 'var(--danger-bg)' : 'var(--success-bg)', color: message.includes('Error') ? 'var(--danger)' : 'var(--success)' }}>
+                    {message}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="form-grid">
+                <div className="form-row two-cols">
+                    <div className="input-group">
+                        <label>Item Name</label>
+                        <input type="text" name="name" className="input-field" value={formData.name} onChange={handleChange} required placeholder="e.g. Cheeseburger" />
+                    </div>
+                    <div className="input-group">
+                        <label>Description</label>
+                        <input type="text" name="description" className="input-field" value={formData.description} onChange={handleChange} required placeholder="Ingredients, flavor, etc." />
+                    </div>
+                </div>
+
+                <div className="form-row multi-cols">
+                    <div className="input-group">
+                        <label>Category</label>
+                        <select name="category" className="input-field" value={formData.category} onChange={handleChange} required style={{ cursor: 'pointer' }}>
+                            {categoryOptions.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        </select>
+                    </div>
+
+                    <div className="input-group">
+                        <label>Price (PHP)</label>
+                        <input type="number" step="0.01" name="price" className="input-field" value={formData.price} onChange={handleChange} required placeholder="0.00" />
+                    </div>
+                    
+                    <div className="input-group">
+                        <label>Stock</label>
+                        <input type="number" name="stock" className="input-field" value={formData.stock} onChange={handleChange} required placeholder="Quantity" min="0" />
+                    </div>
+
+                    <button type="submit" className={`btn ${isEditing ? 'btn-warning' : 'btn-primary'}`}>
+                        {isEditing ? 'Update Item' : 'Save Item'}
+                    </button>
+                    
+                    {isEditing && (
+                        <button type="button" className="btn btn-outline" onClick={handleCancelEdit}>
+                            Cancel
+                        </button>
+                    )}
+                </div>
+            </form>
+        </div>
+    );
+};
+
+const ProductTable = ({ foodItems, handleEditClick, triggerDelete, editingId, formatPeso }) => (
+    <div className="table-card fade-in">
+        <div className="table-header">
+            <h2 style={{ margin: 0, fontSize: '16px', color: 'var(--text)', fontWeight: '700' }}>Current Menu Inventory</h2>
+        </div>
+        
+        <div style={{ overflowX: 'auto' }}>
+            <table className="custom-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th style={{ textAlign: 'center' }}>Stock</th>
+                        <th style={{ textAlign: 'center' }}>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foodItems.length === 0 ? (
+                        <tr>
+                            <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-light)', fontStyle: 'italic' }}>
+                                Your menu is empty. Add items above to see them here!
+                            </td>
+                        </tr>
+                    ) : (
+                        foodItems.map(item => (
+                            <tr key={item.id} className={editingId === item.id ? 'row-editing' : ''}>
+                                <td style={{ fontWeight: '600', color: 'var(--text)' }}>{item.name}</td>
+                                <td style={{ color: 'var(--text-light)' }}>{item.description}</td>
+                                <td>
+                                    <span className="badge badge-category">{item.category || 'Uncategorized'}</span>
+                                </td>
+                                <td className="price-tag">{formatPeso(item.price)}</td>
+                                <td style={{ textAlign: 'center' }}>
+                                    <span className={`badge ${item.stock <= 5 ? 'badge-warning' : 'badge-success'}`}>
+                                        {item.stock} {item.stock <= 5 && '⚠️'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div className="action-buttons">
+                                        <button className="btn btn-light btn-small" onClick={() => handleEditClick(item)}>Edit</button>
+                                        <button className="btn btn-danger btn-small" style={{ backgroundColor: 'var(--danger-bg)', color: 'var(--danger)' }} onClick={() => triggerDelete(item.id)}>Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
+        </div>
+    </div>
+);
+
+const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="modal-overlay">
+            <div className="modal-content">
+                <div className="modal-info">
+                    <div className="modal-icon">⚠️</div>
+                    <h3 style={{ margin: 0, color: 'var(--text)', fontSize: '20px', fontWeight: '700' }}>Delete Menu Item</h3>
+                </div>
+                <p style={{ color: 'var(--text-light)', lineHeight: '1.5', margin: '0 0 24px 0', fontSize: '15px' }}>
+                    Are you sure you want to permanently delete this item? This action cannot be undone and it will be removed from the buyer app immediately.
+                </p>
+                <div className="modal-actions">
+                    <button className="btn btn-outline" onClick={onClose}>Cancel</button>
+                    <button className="btn btn-danger" onClick={onConfirm}>Yes, Delete It</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Main Application Component ---
 
 function Dashboard() {
     const [foodItems, setFoodItems] = useState([]);
     
-    // NEW: Added 'category' to the form data state
+    // NEW: State to hold the dynamic user name (from GitHub, Google, or regular login)
+    const [userName, setUserName] = useState('');
+    
     const [formData, setFormData] = useState({ 
         name: '', 
         description: '', 
@@ -23,11 +268,14 @@ function Dashboard() {
     
     const navigate = useNavigate();
 
-    // The categories that map perfectly to the BuyerDashboard tabs
     const categoryOptions = ['Pizza', 'Burgers', 'Rice Meals', 'Drinks', 'Desserts', 'Uncategorized'];
 
     useEffect(() => {
         fetchItems();
+        
+        // Grab the name from local storage when the dashboard loads
+        const storedName = localStorage.getItem('fullName') || localStorage.getItem('restaurantName') || 'Guest';
+        setUserName(storedName);
     }, []);
 
     const fetchItems = async () => {
@@ -77,7 +325,6 @@ function Dashboard() {
                 description: formData.description,
                 price: parsedPrice,
                 stock: parsedStock,
-                // NEW: Use the dynamic category from the form instead of hardcoding
                 category: formData.category, 
                 imageUrl: "",
                 seller: { id: sellerId }
@@ -92,7 +339,6 @@ function Dashboard() {
                 setMessage('Food item added successfully!');
             }
             
-            // NEW: Reset category field as well
             setFormData({ name: '', description: '', price: '', stock: '', category: 'Uncategorized' }); 
             fetchItems(); 
             setTimeout(() => setMessage(''), 3000); 
@@ -105,7 +351,6 @@ function Dashboard() {
 
     const handleEditClick = (item) => {
         setEditingId(item.id);
-        // NEW: Populate category when editing
         setFormData({
             name: item.name,
             description: item.description,
@@ -119,7 +364,6 @@ function Dashboard() {
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        // NEW: Reset category field
         setFormData({ name: '', description: '', price: '', stock: '', category: 'Uncategorized' });
     };
 
@@ -146,18 +390,9 @@ function Dashboard() {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('restaurantName');
+        localStorage.removeItem('fullName');
         localStorage.removeItem('userId');
         navigate('/login');
-    };
-
-    const colors = {
-        primary: '#1A73E8',     
-        sidebarBg: '#0D47A1',   
-        bg: '#F4F7FC',          
-        cardBg: '#FFFFFF',      
-        text: '#333333',        
-        textLight: '#666666',   
-        border: '#E2E8F0'       
     };
 
     const formatPeso = (value) =>
@@ -167,283 +402,63 @@ function Dashboard() {
         }).format(Number(value || 0));
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'Inter', 'Segoe UI', sans-serif", backgroundColor: colors.bg, position: 'relative' }}>
-            
-            {/* SIDEBAR */}
-            <div style={{ width: '250px', backgroundColor: colors.sidebarBg, color: 'white', display: 'flex', flexDirection: 'column', boxShadow: '2px 0 5px rgba(0,0,0,0.1)', zIndex: 10 }}>
-                <div style={{ padding: '24px', fontSize: '24px', fontWeight: 'bold', borderBottom: '1px solid rgba(255,255,255,0.1)', letterSpacing: '1px' }}>
-                    OrderFlow
-                </div>
-                <nav style={{ display: 'flex', flexDirection: 'column', padding: '16px 0' }}>
-                    {['Dashboard', 'Products', 'Orders'].map(tab => (
-                        <div 
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            style={{
-                                padding: '16px 24px',
-                                cursor: 'pointer',
-                                backgroundColor: activeTab === tab ? 'rgba(255,255,255,0.15)' : 'transparent',
-                                borderLeft: activeTab === tab ? '4px solid white' : '4px solid transparent',
-                                fontWeight: activeTab === tab ? '600' : '400',
-                                transition: 'all 0.2s ease-in-out'
-                            }}
-                        >
-                            {tab}
+        <div className="dashboard-layout">
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+
+            <div className="main-wrapper">
+                <Header 
+                    activeTab={activeTab} 
+                    userName={userName} 
+                    showDropdown={showDropdown} 
+                    setShowDropdown={setShowDropdown} 
+                    handleLogout={handleLogout} 
+                />
+
+                <main className="content-scroll">
+                    {activeTab === 'Dashboard' && (
+                        <DashboardHome 
+                            userName={userName} 
+                            foodItems={foodItems} 
+                            formatPeso={formatPeso} 
+                            setActiveTab={setActiveTab} 
+                        />
+                    )}
+
+                    {activeTab === 'Products' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            <ProductForm 
+                                formData={formData} 
+                                handleChange={handleChange} 
+                                handleSubmit={handleSubmit} 
+                                editingId={editingId} 
+                                handleCancelEdit={handleCancelEdit} 
+                                message={message} 
+                                categoryOptions={categoryOptions} 
+                            />
+                            <ProductTable 
+                                foodItems={foodItems} 
+                                handleEditClick={handleEditClick} 
+                                triggerDelete={triggerDelete} 
+                                editingId={editingId} 
+                                formatPeso={formatPeso} 
+                            />
                         </div>
-                    ))}
-                </nav>
+                    )}
+
+                    {activeTab === 'Orders' && (
+                        <div className="fade-in" style={{ padding: '60px', textAlign: 'center', backgroundColor: 'var(--card-bg)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+                            <h3 style={{ color: 'var(--text-light)' }}>Orders Module</h3>
+                            <p style={{ color: 'var(--text-light)' }}>This section will connect to the Mobile App checkout flow in Phase 5.</p>
+                        </div>
+                    )}
+                </main>
             </div>
 
-            {/* MAIN CONTENT AREA */}
-            <div style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
-                
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                    <div>
-                        <h1 style={{ margin: 0, color: colors.text, fontSize: '28px' }}>{activeTab} Management</h1>
-                        <p style={{ margin: '8px 0 0 0', color: colors.textLight }}>Manage your restaurant's {activeTab.toLowerCase()} and settings.</p>
-                    </div>
-                    
-                    <div style={{ position: 'relative' }}>
-                        <div 
-                            onClick={() => setShowDropdown(!showDropdown)}
-                            style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: colors.cardBg, padding: '8px 16px', borderRadius: '30px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', cursor: 'pointer', userSelect: 'none' }}
-                        >
-                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: colors.primary, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                                S
-                            </div>
-                            <span style={{ fontWeight: '600', color: colors.text, fontSize: '14px' }}>
-                                {localStorage.getItem('restaurantName') || 'Seller Admin'} ▼
-                            </span>
-                        </div>
-
-                        {showDropdown && (
-                            <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', overflow: 'hidden', zIndex: 100, minWidth: '150px', border: `1px solid ${colors.border}` }}>
-                                <div 
-                                    onClick={handleLogout}
-                                    style={{ padding: '12px 16px', color: '#D32F2F', cursor: 'pointer', fontWeight: '600', fontSize: '14px', transition: 'background 0.2s' }}
-                                    onMouseOver={(e) => e.target.style.backgroundColor = '#FFEBEE'}
-                                    onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
-                                >
-                                    Log Out
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </header>
-
-                {activeTab === 'Dashboard' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                        <div style={{ backgroundColor: colors.primary, color: 'white', padding: '32px', borderRadius: '12px', boxShadow: '0 4px 15px rgba(26,115,232,0.25)', backgroundImage: 'linear-gradient(135deg, #1A73E8 0%, #1557B0 100%)' }}>
-                            <h2 style={{ margin: '0 0 8px 0', fontSize: '26px', fontWeight: '700' }}>Welcome back, {localStorage.getItem('restaurantName') || 'Chef'}! 👋</h2>
-                            <p style={{ margin: 0, opacity: 0.9, fontSize: '15px' }}>Here is what's happening with your restaurant today.</p>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px' }}>
-                            <div style={{ backgroundColor: colors.cardBg, padding: '24px', borderRadius: '12px', border: `1px solid ${colors.border}`, boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-                                <div style={{ color: colors.textLight, fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Total Menu Items</div>
-                                <div style={{ color: colors.text, fontSize: '36px', fontWeight: 'bold' }}>{foodItems.length}</div>
-                                <div style={{ color: '#2E7D32', fontSize: '13px', marginTop: '8px', fontWeight: '500' }}>↑ Live from Database</div>
-                            </div>
-                            <div style={{ backgroundColor: colors.cardBg, padding: '24px', borderRadius: '12px', border: `1px solid ${colors.border}`, boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-                                <div style={{ color: colors.textLight, fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Pending Orders</div>
-                                <div style={{ color: colors.text, fontSize: '36px', fontWeight: 'bold' }}>0</div>
-                                <div style={{ color: colors.primary, fontSize: '13px', marginTop: '8px', fontWeight: '500' }}>Waiting for Phase 4 App</div>
-                            </div>
-                            <div style={{ backgroundColor: colors.cardBg, padding: '24px', borderRadius: '12px', border: `1px solid ${colors.border}`, boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-                                <div style={{ color: colors.textLight, fontSize: '13px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Total Revenue</div>
-                                <div style={{ color: colors.text, fontSize: '36px', fontWeight: 'bold' }}>{formatPeso(0)}</div>
-                                <div style={{ color: colors.textLight, fontSize: '13px', marginTop: '8px', fontWeight: '500' }}>Lifetime earnings</div>
-                            </div>
-                        </div>
-
-                        <div style={{ backgroundColor: colors.cardBg, padding: '24px', borderRadius: '12px', border: `1px solid ${colors.border}`, boxShadow: '0 4px 6px rgba(0,0,0,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <h3 style={{ margin: '0 0 8px 0', color: colors.text, fontSize: '18px' }}>Prepare for Mobile Launch</h3>
-                                <p style={{ margin: 0, color: colors.textLight, fontSize: '14px', maxWidth: '600px', lineHeight: '1.5' }}>
-                                    Your menu currently has <strong>{foodItems.length} items</strong>. Ensure your menu is fully populated with accurate descriptions and pricing before the mobile application goes live for buyers.
-                                </p>
-                            </div>
-                            <button 
-                                onClick={() => setActiveTab('Products')}
-                                style={{ padding: '12px 24px', backgroundColor: '#E3F2FD', color: '#1976D2', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s', fontSize: '14px' }}
-                                onMouseOver={(e) => e.target.style.backgroundColor = '#BBDEFB'}
-                                onMouseOut={(e) => e.target.style.backgroundColor = '#E3F2FD'}
-                            >
-                                Manage Products ➔
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'Products' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                        
-                        <div style={{ backgroundColor: editingId ? '#FFF8E1' : colors.cardBg, padding: '24px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: `1px solid ${editingId ? '#FFC107' : colors.border}`, transition: 'all 0.3s' }}>
-                            <h2 style={{ margin: '0 0 20px 0', fontSize: '18px', color: editingId ? '#F57C00' : colors.primary }}>
-                                {editingId ? '✏️ Edit Menu Item' : '+ Add New Menu Item'}
-                            </h2>
-                            
-                            {message && (
-                                <div style={{ padding: '12px', marginBottom: '20px', borderRadius: '6px', backgroundColor: message.includes('Error') ? '#FFEBEE' : '#E8F5E9', color: message.includes('Error') ? '#C62828' : '#2E7D32', fontWeight: '600', fontSize: '14px' }}>
-                                    {message}
-                                </div>
-                            )}
-
-                            {/* NEW: Split form into two rows to prevent UI crunching */}
-                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                
-                                {/* Row 1: Name & Description */}
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '16px' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Item Name</label>
-                                        <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Cheeseburger" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Description</label>
-                                        <input type="text" name="description" value={formData.description} onChange={handleChange} required placeholder="Ingredients, flavor, etc." style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
-                                    </div>
-                                </div>
-
-                                {/* Row 2: Category, Price, Stock, Buttons */}
-                                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr auto auto', gap: '16px', alignItems: 'end' }}>
-                                    
-                                    {/* NEW: Category Dropdown */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Category</label>
-                                        <select name="category" value={formData.category} onChange={handleChange} required style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF', cursor: 'pointer' }}>
-                                            {categoryOptions.map(cat => (
-                                                <option key={cat} value={cat}>{cat}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Price (PHP)</label>
-                                        <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required placeholder="0.00" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
-                                    </div>
-                                    
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Stock</label>
-                                        <input type="number" name="stock" value={formData.stock} onChange={handleChange} required placeholder="Quantity" min="0" style={{ padding: '12px', border: `1px solid ${colors.border}`, borderRadius: '6px', outline: 'none', fontSize: '14px', backgroundColor: '#FFF' }} />
-                                    </div>
-
-                                    <button type="submit" style={{ padding: '0 24px', backgroundColor: editingId ? '#F57C00' : colors.primary, color: 'white', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', height: '43px', transition: 'background-color 0.2s', fontSize: '14px' }}>
-                                        {editingId ? 'Update Item' : 'Save Item'}
-                                    </button>
-                                    
-                                    {editingId && (
-                                        <button type="button" onClick={handleCancelEdit} style={{ padding: '0 24px', backgroundColor: '#F5F5F5', color: '#757575', border: '1px solid #CCC', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', height: '43px', fontSize: '14px' }}>
-                                            Cancel
-                                        </button>
-                                    )}
-                                </div>
-                            </form>
-                        </div>
-
-                        <div style={{ backgroundColor: colors.cardBg, borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: `1px solid ${colors.border}`, overflow: 'hidden' }}>
-                            <div style={{ padding: '20px 24px', borderBottom: `1px solid ${colors.border}`, backgroundColor: '#FAFAFA' }}>
-                                <h2 style={{ margin: 0, fontSize: '16px', color: colors.text, fontWeight: '700' }}>Current Menu Inventory</h2>
-                            </div>
-                            
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                <thead>
-                                    <tr style={{ borderBottom: `2px solid ${colors.border}` }}>
-                                        <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Name</th>
-                                        <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Description</th>
-                                        {/* NEW: Category Column Header */}
-                                        <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Category</th>
-                                        <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase' }}>Price</th>
-                                        <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase', textAlign: 'center' }}>Stock</th>
-                                        <th style={{ padding: '16px 24px', color: colors.textLight, fontWeight: '600', fontSize: '13px', textTransform: 'uppercase', textAlign: 'center' }}>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {foodItems.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: colors.textLight, fontStyle: 'italic' }}>
-                                                Your menu is empty. Add items above to see them here!
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        foodItems.map(item => (
-                                            <tr key={item.id} style={{ borderBottom: `1px solid ${colors.border}`, backgroundColor: editingId === item.id ? '#FFF8E1' : 'transparent' }}>
-                                                <td style={{ padding: '16px 24px', fontWeight: '600', color: colors.text }}>{item.name}</td>
-                                                <td style={{ padding: '16px 24px', color: colors.textLight, fontSize: '14px' }}>{item.description}</td>
-                                                
-                                                {/* NEW: Category Data Cell */}
-                                                <td style={{ padding: '16px 24px', color: colors.primary, fontSize: '13px', fontWeight: '600' }}>
-                                                    {item.category || 'Uncategorized'}
-                                                </td>
-
-                                                <td style={{ padding: '16px 24px', fontWeight: '700', color: '#2E7D32' }}>{formatPeso(item.price)}</td>
-                                                
-                                                <td style={{ padding: '16px 24px', fontWeight: '700', textAlign: 'center', color: item.stock <= 5 ? '#D32F2F' : colors.text }}>
-                                                    {item.stock} {item.stock <= 5 && '⚠️'}
-                                                </td>
-
-                                                <td style={{ padding: '16px 24px', textAlign: 'center' }}>
-                                                    <button onClick={() => handleEditClick(item)} style={{ background: '#E3F2FD', border: 'none', color: '#1976D2', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', marginRight: '8px', fontSize: '12px', fontWeight: '600' }}>
-                                                        Edit
-                                                    </button>
-                                                    <button onClick={() => triggerDelete(item.id)} style={{ background: '#FFEBEE', border: 'none', color: '#D32F2F', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}>
-                                                        Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'Orders' && (
-                    <div style={{ padding: '60px', textAlign: 'center', backgroundColor: colors.cardBg, borderRadius: '12px', border: `1px dashed ${colors.border}` }}>
-                        <h3 style={{ color: colors.textLight }}>Orders Module</h3>
-                        <p style={{ color: colors.textLight }}>This section will connect to the Mobile App checkout flow in Phase 5.</p>
-                    </div>
-                )}
-
-            </div>
-
-            {/* DELETE CONFIRMATION MODAL */}
-            {deleteModal.isOpen && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, backdropFilter: 'blur(2px)' }}>
-                    <div style={{ backgroundColor: 'white', padding: '32px', borderRadius: '16px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', border: '1px solid #F1F5F9' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#FEE2E2', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '20px' }}>
-                                ⚠️
-                            </div>
-                            <h3 style={{ margin: 0, color: '#1E293B', fontSize: '20px', fontWeight: '700' }}>
-                                Delete Menu Item
-                            </h3>
-                        </div>
-                        <p style={{ color: '#64748B', lineHeight: '1.5', margin: '0 0 24px 0', fontSize: '15px' }}>
-                            Are you sure you want to permanently delete this item? This action cannot be undone and it will be removed from the buyer app immediately.
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                            <button 
-                                onClick={() => setDeleteModal({ isOpen: false, itemId: null })}
-                                style={{ padding: '10px 16px', backgroundColor: '#F1F5F9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background-color 0.2s' }}
-                                onMouseOver={(e) => e.target.style.backgroundColor = '#E2E8F0'}
-                                onMouseOut={(e) => e.target.style.backgroundColor = '#F1F5F9'}
-                            >
-                                Cancel
-                            </button>
-                            <button 
-                                onClick={executeDelete}
-                                style={{ padding: '10px 16px', backgroundColor: '#EF4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', transition: 'background-color 0.2s', boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.2)' }}
-                                onMouseOver={(e) => e.target.style.backgroundColor = '#DC2626'}
-                                onMouseOut={(e) => e.target.style.backgroundColor = '#EF4444'}
-                            >
-                                Yes, Delete It
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
+            <DeleteModal 
+                isOpen={deleteModal.isOpen} 
+                onClose={() => setDeleteModal({ isOpen: false, itemId: null })} 
+                onConfirm={executeDelete} 
+            />
         </div>
     );
 }
