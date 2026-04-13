@@ -100,7 +100,6 @@ function Login() {
         
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <h1 style={{ color: colors.primary, margin: '0 0 8px 0', fontSize: '28px', fontWeight: '800', letterSpacing: '-0.5px' }}>OrderFlow</h1>
-            {/* NEW: Updated to match the motto from Register */}
             <p style={{ color: colors.textLight, margin: 0, fontSize: '15px' }}>Your ultimate food ordering companion.</p>
         </div>
 
@@ -124,7 +123,6 @@ function Login() {
               />
           </div>
 
-          {/* NEW: Password with Eye Toggle */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
               <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Password</label>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -155,6 +153,35 @@ function Login() {
           </button>
 
         </form>
+
+        {/* --- NEW GITHUB OAUTH SECTION --- */}
+        <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
+            <hr style={{ flex: 1, border: 'none', borderTop: `1px solid ${colors.border}` }} />
+            <span style={{ padding: '0 10px', color: colors.textLight, fontSize: '14px', fontWeight: '500' }}>or</span>
+            <hr style={{ flex: 1, border: 'none', borderTop: `1px solid ${colors.border}` }} />
+        </div>
+
+        <a 
+          href="http://localhost:8080/oauth2/authorization/github" 
+          style={{ 
+              display: 'block', 
+              textAlign: 'center', 
+              padding: '14px', 
+              backgroundColor: '#24292e', 
+              color: 'white', 
+              textDecoration: 'none', 
+              borderRadius: '8px', 
+              fontWeight: '600', 
+              fontSize: '16px', 
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              transition: 'background-color 0.2s'
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = '#000000'}
+          onMouseOut={(e) => e.target.style.backgroundColor = '#24292e'}
+        >
+          Sign in with GitHub
+        </a>
+        {/* -------------------------------- */}
 
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
             <span 

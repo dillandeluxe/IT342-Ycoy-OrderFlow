@@ -7,9 +7,8 @@ function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState('SELLER'); // NEW: Role is now a state variable
+  const [role, setRole] = useState('SELLER'); 
   
-  // NEW: State for showing/hiding passwords
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -97,7 +96,6 @@ function Register() {
         
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <h1 style={{ color: colors.primary, margin: '0 0 8px 0', fontSize: '28px', fontWeight: '800', letterSpacing: '-0.5px' }}>OrderFlow</h1>
-            {/* NEW: Updated to a Motto */}
             <p style={{ color: colors.textLight, margin: 0, fontSize: '15px' }}>Your ultimate food ordering companion.</p>
         </div>
 
@@ -109,7 +107,6 @@ function Register() {
 
         <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          {/* NEW: Role Selection Buttons */}
           <div style={{ display: 'flex', gap: '10px', backgroundColor: '#FAFAFA', padding: '6px', borderRadius: '8px', border: `1px solid ${colors.border}` }}>
               <button 
                 type="button" 
@@ -128,7 +125,6 @@ function Register() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {/* NEW: Label changes based on Role */}
               <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>
                   {role === 'SELLER' ? 'Restaurant Name' : 'Full Name'}
               </label>
@@ -154,7 +150,6 @@ function Register() {
               />
           </div>
 
-          {/* NEW: Password with Eye Toggle */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
               <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Password</label>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -175,7 +170,6 @@ function Register() {
               </div>
           </div>
 
-          {/* NEW: Confirm Password with Eye Toggle */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
               <label style={{ fontSize: '14px', fontWeight: '600', color: colors.textLight }}>Confirm Password</label>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -206,6 +200,35 @@ function Register() {
           </button>
 
         </form>
+
+        {/* --- NEW GITHUB OAUTH SECTION --- */}
+        <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
+            <hr style={{ flex: 1, border: 'none', borderTop: `1px solid ${colors.border}` }} />
+            <span style={{ padding: '0 10px', color: colors.textLight, fontSize: '14px', fontWeight: '500' }}>or</span>
+            <hr style={{ flex: 1, border: 'none', borderTop: `1px solid ${colors.border}` }} />
+        </div>
+
+        <a 
+          href="http://localhost:8080/oauth2/authorization/github" 
+          style={{ 
+              display: 'block', 
+              textAlign: 'center', 
+              padding: '14px', 
+              backgroundColor: '#24292e', 
+              color: 'white', 
+              textDecoration: 'none', 
+              borderRadius: '8px', 
+              fontWeight: '600', 
+              fontSize: '16px', 
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              transition: 'background-color 0.2s'
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = '#000000'}
+          onMouseOut={(e) => e.target.style.backgroundColor = '#24292e'}
+        >
+          Sign up with GitHub
+        </a>
+        {/* -------------------------------- */}
 
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
             <span 
