@@ -1,6 +1,8 @@
-package com.example.orderflowmobile.api
+package com.example.orderflowmobile.core
 
 
+import com.example.orderflowmobile.menu.FoodApi
+import com.example.orderflowmobile.auth.AuthApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

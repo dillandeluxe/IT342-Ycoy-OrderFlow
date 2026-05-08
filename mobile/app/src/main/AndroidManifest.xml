@@ -16,12 +16,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31" >
         <activity
-            android:name=".DashboardActivity"
+            android:name=".menu.DashboardActivity"
             android:exported="false" />
-        <activity android:name=".FoodDetailActivity"
+        <activity android:name=".menu.FoodDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".auth.LoginActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".auth.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

@@ -1,6 +1,5 @@
-package com.example.orderflowmobile.api
+package com.example.orderflowmobile.menu
 
-import com.example.orderflowmobile.models.FoodItem
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header

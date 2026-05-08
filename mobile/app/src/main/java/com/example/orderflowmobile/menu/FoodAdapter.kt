@@ -1,4 +1,4 @@
-package com.example.orderflowmobile.adapters
+package com.example.orderflowmobile.menu
 
 import android.content.Intent
 import android.view.LayoutInflater
@@ -8,9 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.orderflowmobile.FoodDetailActivity
 import com.example.orderflowmobile.R
-import com.example.orderflowmobile.models.FoodItem
 
 class FoodAdapter(private var foodList: List<FoodItem>) : RecyclerView.Adapter<FoodAdapter.FoodViewHolder>() {
 

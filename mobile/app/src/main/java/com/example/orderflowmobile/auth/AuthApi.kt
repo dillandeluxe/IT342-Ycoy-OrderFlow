@@ -1,4 +1,4 @@
-package com.example.orderflowmobile.api
+package com.example.orderflowmobile.auth
 
 import retrofit2.Response
 import retrofit2.http.Body

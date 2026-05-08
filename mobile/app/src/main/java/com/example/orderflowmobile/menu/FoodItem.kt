@@ -1,4 +1,4 @@
-package com.example.orderflowmobile.models
+package com.example.orderflowmobile.menu
 
 data class FoodItem(
     val id: Long,

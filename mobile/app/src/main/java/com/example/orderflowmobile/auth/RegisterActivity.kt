@@ -1,4 +1,4 @@
-package com.example.orderflowmobile
+package com.example.orderflowmobile.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,8 +7,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.orderflowmobile.api.RegisterRequest
-import com.example.orderflowmobile.api.ApiClient
+import com.example.orderflowmobile.R
+import com.example.orderflowmobile.core.ApiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
