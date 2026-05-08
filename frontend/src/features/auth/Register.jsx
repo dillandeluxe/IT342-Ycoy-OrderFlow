@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from './services/api'; 
+import { register } from '../../services/api'; 
 import './Register.css';
 
 // --- Sub-components ---

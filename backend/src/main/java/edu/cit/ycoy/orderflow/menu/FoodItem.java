@@ -1,8 +1,10 @@
-package edu.cit.ycoy.orderflow.entity;
+package edu.cit.ycoy.orderflow.menu;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import edu.cit.ycoy.orderflow.auth.User;
 
 @Entity
 @Table(name = "products") // ERD MATCH: Officially named 'products'
@@ -15,7 +17,7 @@ public class FoodItem {
     // ERD MATCH: Proper Foreign Key relationship to the USERS table!
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
-    @JsonIgnoreProperties({"passwordHash", "createdAt"}) // Security: Prevents the seller's password from leaking to the frontend!
+    @JsonIgnoreProperties({"passwordHash", "createdAt"}) 
     private User seller;
 
     @Column(nullable = false)

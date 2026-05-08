@@ -1,4 +1,4 @@
-package edu.cit.ycoy.orderflow.entity;
+package edu.cit.ycoy.orderflow.auth;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

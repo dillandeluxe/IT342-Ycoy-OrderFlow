@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFoodItems } from './services/api';
+import { getFoodItems } from '../services/api';
 import './BuyerDashboard.css';
 
 // --- Subcomponents ---

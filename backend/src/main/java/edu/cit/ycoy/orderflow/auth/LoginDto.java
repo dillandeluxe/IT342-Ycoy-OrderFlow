@@ -1,4 +1,4 @@
-package edu.cit.ycoy.orderflow.dto;
+package edu.cit.ycoy.orderflow.auth;
 
 public class LoginDto {
     private String email;

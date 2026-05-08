@@ -1,7 +1,7 @@
 package edu.cit.ycoy.orderflow.config;
 
-import edu.cit.ycoy.orderflow.entity.User;
-import edu.cit.ycoy.orderflow.repository.UserRepository;
+import edu.cit.ycoy.orderflow.auth.User;
+import edu.cit.ycoy.orderflow.auth.UserRepository;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;

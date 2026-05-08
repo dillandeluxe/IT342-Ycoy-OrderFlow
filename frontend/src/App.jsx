@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './Login';
-import Register from './Register';
-import Dashboard from './Dashboard'; // The main feature we built!
-import BuyerDashboard from './BuyerDashboard';
-import ProductDetails from './ProductDetails';
-import Landing from './Landing';
-import OAuth2RedirectHandler from './OAuth2RedirectHandler';
+import Login from './features/auth/Login';
+import Register from './features/auth/Register';
+import Dashboard from './dashboard/Dashboard'; // The main feature we built!
+import BuyerDashboard from './dashboard/BuyerDashboard';
+import ProductDetails from './menu/ProductDetails';
+import Landing from './dashboard/Landing';
+import OAuth2RedirectHandler from './features/auth/OAuth2RedirectHandler';
 
 function App() {
   return (

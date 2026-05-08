@@ -1,6 +1,5 @@
-package edu.cit.ycoy.orderflow.repository;
+package edu.cit.ycoy.orderflow.auth;
 
-import edu.cit.ycoy.orderflow.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

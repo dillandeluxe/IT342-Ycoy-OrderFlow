@@ -1,12 +1,8 @@
-package edu.cit.ycoy.orderflow.controller;
+package edu.cit.ycoy.orderflow.auth;
 
-import edu.cit.ycoy.orderflow.dto.LoginDto;
-import edu.cit.ycoy.orderflow.dto.UserRegistrationDto;
-import edu.cit.ycoy.orderflow.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
-import edu.cit.ycoy.orderflow.entity.User;
 
 @RestController
 @RequestMapping("/api/auth")

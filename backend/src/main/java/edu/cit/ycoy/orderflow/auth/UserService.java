@@ -1,8 +1,5 @@
-package edu.cit.ycoy.orderflow.service;
+package edu.cit.ycoy.orderflow.auth;
 
-import edu.cit.ycoy.orderflow.dto.UserRegistrationDto;
-import edu.cit.ycoy.orderflow.entity.User;
-import edu.cit.ycoy.orderflow.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

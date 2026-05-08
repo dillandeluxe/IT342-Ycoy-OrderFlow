@@ -1,9 +1,8 @@
-package edu.cit.ycoy.orderflow.service;
+package edu.cit.ycoy.orderflow.menu;
 
-import edu.cit.ycoy.orderflow.entity.FoodItem;
-import edu.cit.ycoy.orderflow.entity.User;
-import edu.cit.ycoy.orderflow.repository.FoodItemRepository;
-import edu.cit.ycoy.orderflow.repository.UserRepository;
+import edu.cit.ycoy.orderflow.auth.User;
+import edu.cit.ycoy.orderflow.auth.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

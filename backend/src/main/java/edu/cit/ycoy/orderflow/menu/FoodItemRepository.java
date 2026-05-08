@@ -1,6 +1,5 @@
-package edu.cit.ycoy.orderflow.repository;
+package edu.cit.ycoy.orderflow.menu;
 
-import edu.cit.ycoy.orderflow.entity.FoodItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
