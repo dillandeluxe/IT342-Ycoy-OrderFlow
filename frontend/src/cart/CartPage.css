@@ -1,0 +1,280 @@
+.cart-page-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Inter', 'Montserrat', sans-serif;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cart-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    animation: slideInUp 0.4s ease-out forwards;
+}
+
+.cart-header h2 {
+    margin: 0;
+    margin-left: 1.5rem;
+    color: #1F2937;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    color: #4B5563;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-btn:hover {
+    background-color: #F9FAFB;
+    color: #111827;
+    transform: translateX(-4px);
+    border-color: #D1D5DB;
+}
+
+/* Empty State */
+.empty-cart-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    animation: slideInUp 0.5s ease-out forwards;
+}
+
+.empty-cart-state h3 {
+    color: #4B5563;
+    margin-bottom: 1.5rem;
+}
+
+.browse-menu-btn {
+    background-color: #fca311;
+    color: white;
+    border: none;
+    padding: 0.8rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(252, 163, 17, 0.25);
+}
+
+.browse-menu-btn:hover {
+    background-color: #f89600;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(252, 163, 17, 0.3);
+}
+
+/* Cart Layout */
+.cart-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .cart-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cart-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.cart-item-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 1.25rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    opacity: 0;
+    animation: slideInUp 0.4s ease-out forwards;
+}
+
+/* Stagger animations for items */
+.cart-item-card:nth-child(1) { animation-delay: 0.1s; }
+.cart-item-card:nth-child(2) { animation-delay: 0.2s; }
+.cart-item-card:nth-child(3) { animation-delay: 0.3s; }
+.cart-item-card:nth-child(4) { animation-delay: 0.4s; }
+.cart-item-card:nth-child(5) { animation-delay: 0.5s; }
+
+.cart-item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-color: #f5f5f5;
+}
+
+.cart-item-image {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    background-position: center;
+    background-size: cover;
+    margin-right: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.cart-item-card:hover .cart-item-image {
+    transform: scale(1.05);
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.cart-item-details h4 {
+    margin: 0 0 0.5rem 0;
+    color: #111827;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.cart-item-price {
+    color: #fca311;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
+
+.cart-item-meta {
+    font-size: 0.9rem;
+    color: #6B7280;
+}
+
+.cart-item-subtotal {
+    color: #374151;
+    font-weight: 500;
+}
+
+.cart-item-actions {
+    margin-left: 1rem;
+}
+
+.remove-btn {
+    background: #FEF2F2;
+    color: #EF4444;
+    border: none;
+    padding: 0.7rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.remove-btn:hover {
+    background: #FEE2E2;
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.15);
+}
+
+.remove-btn:active {
+    transform: scale(0.95);
+}
+
+/* Order Summary */
+.cart-summary {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    position: sticky;
+    top: 2rem;
+    opacity: 0;
+    animation: slideInUp 0.6s ease-out 0.2s forwards;
+}
+
+.cart-summary h3 {
+    margin: 0 0 1.5rem 0;
+    color: #111827;
+    font-size: 1.5rem;
+    font-weight: 800;
+    border-bottom: 2px solid #F3F4F6;
+    padding-bottom: 1.25rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    color: #4B5563;
+    font-size: 1.05rem;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #F3F4F6;
+    color: #111827;
+    font-weight: 800;
+    font-size: 1.35rem;
+}
+
+.checkout-btn {
+    width: 100%;
+    margin-top: 2rem;
+    background-color: #10B981;
+    color: white;
+    border: none;
+    padding: 1.1rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(16, 185, 129, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkout-btn:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+}
+
+.checkout-btn:active {
+    transform: translateY(0);
+}

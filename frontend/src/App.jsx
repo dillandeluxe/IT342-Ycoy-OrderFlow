@@ -7,6 +7,7 @@ import BuyerDashboard from './dashboard/BuyerDashboard';
 import ProductDetails from './menu/ProductDetails';
 import Landing from './dashboard/Landing';
 import OAuth2RedirectHandler from './features/auth/OAuth2RedirectHandler';
+import CartPage from './cart/CartPage';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
         <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
         <Route path="/" element={<Landing />} />
         <Route path="*" element={<Navigate to="/" />} />

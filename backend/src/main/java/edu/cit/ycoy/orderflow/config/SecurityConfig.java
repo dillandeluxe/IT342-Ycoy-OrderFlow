@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/food/**").permitAll()
+                .requestMatchers("/api/cart/**").permitAll() // FIX: Open cart routes
                 // Removed the manual OAuth2 matchers here so Spring handles them automatically!
                 .anyRequest().authenticated()
             )

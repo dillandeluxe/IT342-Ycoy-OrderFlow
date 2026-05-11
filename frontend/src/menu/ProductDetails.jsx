@@ -2,18 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './ProductDetails.css';
 
+// 1. Import our new Cart hook!
+import { useCart } from '../cart/CartContext'; 
+
 const ProductDetails = () => {
     const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
     
+    // 2. Bring in the addToCart function from the Context
+    const { addToCart } = useCart();
+
     const [item, setItem] = useState(null);
     const [restaurantName, setRestaurantName] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // First try to get data from navigation state (fastest path)
         if (location.state && location.state.item) {
             setItem(location.state.item);
             setRestaurantName(location.state.restaurantName || "Local Seller");
@@ -21,8 +26,6 @@ const ProductDetails = () => {
             return;
         }
 
-        // If no state, we would fetch from API based on ID.
-        // For now, we simulate pulling from our localStorage DB since API isn't fully wired for this param
         const token = localStorage.getItem('token');
         if (!token) {
             navigate('/login');
@@ -30,8 +33,6 @@ const ProductDetails = () => {
         }
         
         try {
-            // Find item globally (hack for now without standard GET /api/items/{id} implemented)
-            // Just redirect back to dashboard if we don't have state for now to keep it safe
             console.warn("ProductDetails accessed without state, redirecting...");
             navigate('/buyer-dashboard');
         } catch (error) {
@@ -78,6 +79,18 @@ const ProductDetails = () => {
     const handleDecrement = () => {
         if (quantity > 1) {
             setQuantity(prev => prev - 1);
+        }
+    };
+
+    // 3. Create the function that handles the button click
+    const handleAddToCartClick = async () => {
+        // Grab the logged-in user's ID (adjust this if you save it differently in localStorage during login)
+        const buyerId = localStorage.getItem('userId') || 1; 
+        
+        // Because our backend currently increments by 1 per request, 
+        // we will loop the request to match the user's selected quantity!
+        for(let i = 0; i < quantity; i++) {
+            await addToCart(buyerId, item.id);
         }
     };
 
@@ -143,10 +156,11 @@ const ProductDetails = () => {
                             </div>
                         )}
 
+                        {/* 4. Wire the button to our new handleAddToCartClick function */}
                         <button 
                             className="add-to-cart-large"
                             disabled={isSoldOut}
-                            title="Cart functionality is currently disabled"
+                            onClick={handleAddToCartClick}
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <circle cx="9" cy="21" r="1"></circle>

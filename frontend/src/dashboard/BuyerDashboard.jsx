@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getFoodItems } from '../services/api';
+import { useCart } from '../cart/CartContext';
 import './BuyerDashboard.css';
 
 // --- Subcomponents ---
 
-const NavBar = ({ searchQuery, setSearchQuery, showDropdown, setShowDropdown, handleLogout }) => (
+const NavBar = ({ searchQuery, setSearchQuery, showDropdown, setShowDropdown, handleLogout }) => {
+    const { cartItems } = useCart();
+    const navigate = useNavigate();
+    
+    // Calculate total quantity of items in the cart
+    const cartCount = cartItems?.reduce((total, item) => total + (item.quantity || 1), 0) || 0;
+
+    return (
     <nav className="buyer-navbar">
         <div className="buyer-logo">
             <span style={{ marginRight: '8px' }}></span> OrderFlow
@@ -28,13 +36,13 @@ const NavBar = ({ searchQuery, setSearchQuery, showDropdown, setShowDropdown, ha
         </div>
 
         <div className="nav-actions">
-            <button className="cart-btn" title="Cart functionality is currently disabled">
+            <button className="cart-btn" title="View Cart" onClick={() => navigate('/cart')}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="9" cy="21" r="1"></circle>
                     <circle cx="20" cy="21" r="1"></circle>
                     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                 </svg>
-                Cart <span className="cart-badge">0</span>
+                Cart <span className="cart-badge">{cartCount}</span>
             </button>
 
             <div className="profile-dropdown-container">
@@ -51,7 +59,8 @@ const NavBar = ({ searchQuery, setSearchQuery, showDropdown, setShowDropdown, ha
             </div>
         </div>
     </nav>
-);
+    );
+};
 
 const CategoryFilter = ({ categories, activeCategory, setActiveCategory }) => {
     const categoryIcons = {
@@ -122,7 +131,8 @@ const FoodCard = ({ item, getRestaurantName, formatPeso, onViewProduct }) => {
                     <button 
                         className="add-to-cart-btn"
                         disabled={isSoldOut}
-                        title="Cart functionality is currently disabled"
+                        onClick={() => onViewProduct(item)}
+                        title="View product to add to cart"
                     >
                         {isSoldOut ? "Out of Stock" : "Add to Cart"}
                     </button>
