@@ -10,118 +10,176 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp"
         android:gravity="center">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="OrderFlow"
-            android:textColor="#1A73E8"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="32dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Create a Buyer Account"
-            android:textColor="#64748B"
-            android:textSize="16sp"
-            android:layout_marginBottom="40dp"/>
-
-        <EditText
-            android:id="@+id/etFullName"
+        <!-- CardView for the Register Form -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Full Name"
-            android:inputType="textPersonName"
-            android:padding="16dp"
-            android:background="#FFFFFF"
-            android:elevation="2dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_margin="24dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#E2E8F0"
+            app:strokeWidth="1dp">
 
-        <EditText
-            android:id="@+id/etEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Email Address"
-            android:inputType="textEmailAddress"
-            android:padding="16dp"
-            android:background="#FFFFFF"
-            android:elevation="2dp"
-            android:layout_marginBottom="16dp"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:passwordToggleEnabled="true"
-            app:passwordToggleTint="#64748B">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPassword"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:hint="Password"
-                android:padding="16dp"
-                android:background="#FFFFFF"
-                android:elevation="2dp" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:orientation="vertical"
+                android:padding="32dp">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            app:passwordToggleEnabled="true"
-            app:passwordToggleTint="#64748B">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="OrderFlow"
+                    android:textColor="#1A73E8"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:layout_marginBottom="8dp"/>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etConfirmPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:hint="Confirm Password"
-                android:padding="16dp"
-                android:background="#FFFFFF"
-                android:elevation="2dp" />
-        </com.google.android.material.textfield.TextInputLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create a Buyer Account"
+                    android:textColor="#64748B"
+                    android:textSize="15sp"
+                    android:textAlignment="center"
+                    android:layout_marginBottom="32dp"/>
 
-        <Button
-            android:id="@+id/btnRegister"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="Sign Up"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:backgroundTint="#1A73E8"
-            app:cornerRadius="12dp"
-            android:layout_marginBottom="16dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Full Name"
+                    android:textColor="#64748B"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
 
-        <TextView
-            android:id="@+id/tvMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textSize="14sp"
-            android:layout_marginBottom="16dp"
-            android:textAlignment="center"/>
+                <EditText
+                    android:id="@+id/etFullName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Full Name"
+                    android:inputType="textPersonName"
+                    android:padding="14dp"
+                    android:background="@drawable/edit_text_bg"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="20dp"/>
 
-        <TextView
-            android:id="@+id/tvGoToLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Already have an account? Log in"
-            android:textColor="#1A73E8"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:padding="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_marginBottom="32dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Email Address"
+                    android:textColor="#64748B"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <EditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Email Address"
+                    android:inputType="textEmailAddress"
+                    android:padding="14dp"
+                    android:background="@drawable/edit_text_bg"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="20dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Password"
+                    android:textColor="#64748B"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:hintEnabled="false"
+                    app:passwordToggleEnabled="true"
+                    app:passwordToggleTint="#64748B">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:hint="Enter Password"
+                        android:padding="14dp"
+                        android:background="@drawable/edit_text_bg"
+                        android:textSize="15sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Confirm Password"
+                    android:textColor="#64748B"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    app:hintEnabled="false"
+                    app:passwordToggleEnabled="true"
+                    app:passwordToggleTint="#64748B">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etConfirmPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:hint="Confirm Password"
+                        android:padding="14dp"
+                        android:background="@drawable/edit_text_bg"
+                        android:textSize="15sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/btnRegister"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="Sign Up"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:backgroundTint="#1A73E8"
+                    app:cornerRadius="8dp"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:id="@+id/tvMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:layout_marginBottom="16dp"
+                    android:textAlignment="center"/>
+
+                <TextView
+                    android:id="@+id/tvGoToLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Already have an account? Log in"
+                    android:textColor="#1A73E8"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:padding="8dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>
