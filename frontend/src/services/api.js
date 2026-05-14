@@ -53,4 +53,7 @@ export const addFoodItem = (data) => api.post('/food', data);
 export const updateFoodItem = (id, foodItem) => api.put(`/food/${id}`, foodItem);
 export const deleteFoodItem = (id) => api.delete(`/food/${id}`);
 
+// Transactions (Orders)
+export const getBuyerOrderHistory = (buyerId) => api.get(`/transactions/buyer/${buyerId}`);
+
 export default api;
