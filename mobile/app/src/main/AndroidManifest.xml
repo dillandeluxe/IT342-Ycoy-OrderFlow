@@ -26,14 +26,17 @@
             android:name=".transaction.OrderHistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".auth.LoginActivity"
-            android:exported="true" >
-            <intent-filter>
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.OrderFlowMobile"> <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".auth.LoginActivity"
+            android:exported="false" />
         <activity
             android:name=".auth.RegisterActivity"
             android:exported="false" />

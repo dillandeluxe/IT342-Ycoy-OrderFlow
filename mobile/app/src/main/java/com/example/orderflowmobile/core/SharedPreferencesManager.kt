@@ -22,4 +22,8 @@ object SharedPreferencesManager {
     var email: String?
         get() = prefs.getString("EMAIL", null)
         set(value) = prefs.edit().putString("EMAIL", value).apply()
+
+    fun clear() {
+        prefs.edit().clear().apply()
+    }
 }
