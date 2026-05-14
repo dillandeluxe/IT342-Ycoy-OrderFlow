@@ -152,7 +152,16 @@ const ProductForm = ({ formData, handleChange, handleSubmit, editingId, handleCa
                         <label>Stock</label>
                         <input type="number" name="stock" className="input-field" value={formData.stock} onChange={handleChange} required placeholder="Quantity" min="0" />
                     </div>
+                </div>
 
+                <div className="form-row single-col" style={{gridColumn: '1 / -1'}}>
+                    <div className="input-group">
+                        <label>Image URL (Optional)</label>
+                        <input type="url" name="imageUrl" className="input-field" value={formData.imageUrl} onChange={handleChange} placeholder="e.g. https://example.com/burger.jpg" />
+                    </div>
+                </div>
+
+                <div className="form-row multi-cols">
                     <button type="submit" className={`btn ${isEditing ? 'btn-warning' : 'btn-primary'}`}>
                         {isEditing ? 'Update Item' : 'Save Item'}
                     </button>
@@ -256,7 +265,8 @@ function Dashboard() {
         description: '', 
         price: '', 
         stock: '',
-        category: 'Uncategorized' 
+        category: 'Uncategorized',
+        imageUrl: ''
     });
     
     const [message, setMessage] = useState('');
@@ -326,7 +336,7 @@ function Dashboard() {
                 price: parsedPrice,
                 stock: parsedStock,
                 category: formData.category, 
-                imageUrl: "",
+                imageUrl: formData.imageUrl,
                 seller: { id: sellerId }
             };
             
@@ -339,7 +349,7 @@ function Dashboard() {
                 setMessage('Food item added successfully!');
             }
             
-            setFormData({ name: '', description: '', price: '', stock: '', category: 'Uncategorized' }); 
+            setFormData({ name: '', description: '', price: '', stock: '', category: 'Uncategorized', imageUrl: '' }); 
             fetchItems(); 
             setTimeout(() => setMessage(''), 3000); 
         } catch (error) {
@@ -356,7 +366,8 @@ function Dashboard() {
             description: item.description,
             price: item.price,
             stock: item.stock || 0,
-            category: item.category || 'Uncategorized'
+            category: item.category || 'Uncategorized',
+            imageUrl: item.imageUrl || ''
         });
         setActiveTab('Products');
         window.scrollTo({ top: 0, behavior: 'smooth' });

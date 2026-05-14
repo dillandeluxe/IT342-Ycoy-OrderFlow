@@ -48,4 +48,7 @@ dependencies {
 
     // Coroutines for asynchronous API calls
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // Glide for image loading
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }

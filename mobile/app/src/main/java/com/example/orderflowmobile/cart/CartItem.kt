@@ -9,5 +9,6 @@ data class CartItem(
 data class CartFoodItem(
     val id: Long,
     val name: String,
-    val price: Double
+    val price: Double,
+    val imageUrl: String?
 )

@@ -11,6 +11,7 @@ const OAuth2RedirectHandler = () => {
         const email = urlParams.get('email');
         const role = urlParams.get('role');
         const fullName = urlParams.get('fullName');
+        const id = urlParams.get('id');
 
         if (email) {
             // Save to localStorage just like your regular login does
@@ -18,10 +19,18 @@ const OAuth2RedirectHandler = () => {
             localStorage.setItem('userRole', role);
             
             // FIXED: Changed 'userName' to 'fullName' so the Dashboard can find it!
-            localStorage.setItem('fullName', fullName); 
+            localStorage.setItem('restaurantName', fullName); 
             
-            // Redirect to the Seller Dashboard
-            navigate('/dashboard');
+            if (id) {
+                localStorage.setItem('userId', id);
+            }
+            
+            // Redirect to the correct Dashboard based on role
+            if (role === 'BUYER') {
+                navigate('/buyer-dashboard');
+            } else {
+                navigate('/dashboard');
+            }
         } else {
             // If it failed, go back to login
             navigate('/login');

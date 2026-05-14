@@ -46,7 +46,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         // This mimics exactly what your AuthController returns!
         String targetUrl = "http://localhost:5173/oauth2/redirect?email=" + user.getEmail() + 
                            "&role=" + user.getRole() + 
-                           "&fullName=" + user.getFullName();
+                           "&fullName=" + user.getFullName() +
+                           "&id=" + user.getId();
                            
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }

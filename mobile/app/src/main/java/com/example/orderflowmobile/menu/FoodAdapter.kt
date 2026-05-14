@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.orderflowmobile.R
 import com.example.orderflowmobile.core.ApiClient
 import com.example.orderflowmobile.core.SharedPreferencesManager
@@ -22,6 +24,7 @@ class FoodAdapter(
 ) : RecyclerView.Adapter<FoodAdapter.FoodViewHolder>() {
 
     class FoodViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val ivFoodImage: ImageView = itemView.findViewById(R.id.ivFoodImage)
         val tvSellerName: TextView = itemView.findViewById(R.id.tvSellerName)
         val tvFoodName: TextView = itemView.findViewById(R.id.tvFoodName)
         val tvFoodPrice: TextView = itemView.findViewById(R.id.tvFoodPrice)
@@ -45,12 +48,23 @@ class FoodAdapter(
         holder.tvFoodPrice.text = String.format("₱%.2f", item.price)
         holder.tvFoodDesc.text = item.description
 
+        if (!item.imageUrl.isNullOrBlank()) {
+            Glide.with(context)
+                .load(item.imageUrl)
+                .centerCrop()
+                .placeholder(R.drawable.ic_launcher_background)
+                .into(holder.ivFoodImage)
+        } else {
+            holder.ivFoodImage.setImageResource(R.drawable.ic_launcher_background)
+        }
+
         holder.btnViewFood.setOnClickListener {
             val intent = Intent(context, FoodDetailActivity::class.java).apply {
                 putExtra("NAME", item.name)
                 putExtra("PRICE", item.price)
                 putExtra("DESC", item.description)
                 putExtra("SELLER", restaurantName)
+                putExtra("IMAGE_URL", item.imageUrl)
             }
             context.startActivity(intent)
         }
@@ -67,4 +81,4 @@ class FoodAdapter(
         foodList = newList
         notifyDataSetChanged()
     }
-}
+}
