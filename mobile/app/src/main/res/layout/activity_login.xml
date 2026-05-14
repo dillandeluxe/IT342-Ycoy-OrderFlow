@@ -114,59 +114,6 @@
                 android:layout_marginBottom="16dp"
                 android:textAlignment="center"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1"
-                    android:background="#E2E8F0"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="or"
-                    android:paddingHorizontal="10dp"
-                    android:textColor="#64748B"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1"
-                    android:background="#E2E8F0"/>
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btnGithubLogin"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Sign in with GitHub"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:backgroundTint="#24292E"
-                app:cornerRadius="8dp"
-                android:layout_marginBottom="12dp"
-                app:strokeWidth="0dp"/>
-
-            <Button
-                android:id="@+id/btnGoogleLogin"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Sign in with Google"
-                android:textColor="#757575"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:backgroundTint="#FFFFFF"
-                app:cornerRadius="8dp"
-                android:layout_marginBottom="24dp"
-                app:strokeColor="#DDDDDD"
-                app:strokeWidth="1dp"/>
-
             <TextView
                 android:id="@+id/tvGoToRegister"
                 android:layout_width="match_parent"
