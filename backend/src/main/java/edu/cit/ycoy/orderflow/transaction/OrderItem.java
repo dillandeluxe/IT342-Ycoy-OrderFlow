@@ -3,6 +3,7 @@ package edu.cit.ycoy.orderflow.transaction;
 import edu.cit.ycoy.orderflow.menu.FoodItem;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "order_items")
@@ -13,6 +14,7 @@ public class OrderItem {
     private Long id;
 
     // ERD MATCH: order_id
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;

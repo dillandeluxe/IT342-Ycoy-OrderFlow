@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
+@CrossOrigin(origins = { "http://localhost:5173", "http://127.0.0.1:5173" })
 public class CartController {
 
     private final CartRepository cartRepository;
@@ -20,7 +20,8 @@ public class CartController {
     private final UserRepository userRepository;
     private final FoodItemRepository foodItemRepository;
 
-    public CartController(CartRepository cartRepository, CartItemRepository cartItemRepository, UserRepository userRepository, FoodItemRepository foodItemRepository) {
+    public CartController(CartRepository cartRepository, CartItemRepository cartItemRepository,
+            UserRepository userRepository, FoodItemRepository foodItemRepository) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.userRepository = userRepository;
@@ -38,7 +39,8 @@ public class CartController {
     public ResponseEntity<?> addToCart(@PathVariable Long buyerId, @PathVariable Long foodItemId) {
         try {
             User buyer = userRepository.findById(buyerId).orElseThrow(() -> new RuntimeException("Buyer not found"));
-            FoodItem food = foodItemRepository.findById(foodItemId).orElseThrow(() -> new RuntimeException("Food not found"));
+            FoodItem food = foodItemRepository.findById(foodItemId)
+                    .orElseThrow(() -> new RuntimeException("Food not found"));
             User seller = food.getSeller();
 
             // 1. Find the Cart, or make a new one
@@ -74,7 +76,7 @@ public class CartController {
 
     @DeleteMapping("/{cartItemId}")
     public ResponseEntity<?> removeFromCart(@PathVariable Long cartItemId) {
-        if(cartItemRepository.existsById(cartItemId)) {
+        if (cartItemRepository.existsById(cartItemId)) {
             cartItemRepository.deleteById(cartItemId);
             return ResponseEntity.ok().build();
         }

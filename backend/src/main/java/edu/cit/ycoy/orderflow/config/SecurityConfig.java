@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/food/**").permitAll()
-                .requestMatchers("/api/cart/**").permitAll() // FIX: Open cart routes
+                .requestMatchers("/api/cart/**").permitAll() 
+                .requestMatchers("/api/transactions/**").permitAll()// FIX: Open cart routes
                 .requestMatchers("/error").permitAll() // FIX: Allow error route so it doesn't redirect loop on 500s
                 // Removed the manual OAuth2 matchers here so Spring handles them automatically!
                 .anyRequest().authenticated()
@@ -53,9 +54,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
+        // localhost / 127.0.0.1 = web browser dev server
+        // 10.0.2.2 = Android Emulator's alias for the host machine
+        // * = any other device on the network (physical phones, etc.)
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(false);
 

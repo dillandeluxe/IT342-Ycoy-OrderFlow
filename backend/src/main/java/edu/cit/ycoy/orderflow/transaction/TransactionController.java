@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -31,32 +33,44 @@ public class TransactionController {
         this.cartItemRepository = cartItemRepository;
     }
 
-    // The @Transactional tag ensures that if the payment fails, the cart is NOT deleted!
     @PostMapping("/checkout/{buyerId}")
     @Transactional 
     public ResponseEntity<?> processCheckout(@PathVariable Long buyerId, @RequestParam(defaultValue = "CASH") String paymentMethod) {
         
-        // 1. Find the user's active cart (Assuming seller ID is 1 for now, or you can loop through multiple carts)
-        // For simplicity, let's grab the first active cart for this buyer
+        // 1. Find the user's active cart safely
         List<Cart> activeCarts = cartRepository.findAll().stream()
-                .filter(c -> c.getBuyer().getId().equals(buyerId) && c.getStatus().equals("active"))
+                .filter(c -> c.getBuyer() != null && c.getBuyer().getId().equals(buyerId))
+                .filter(c -> c.getStatus() == null || c.getStatus().equalsIgnoreCase("active"))
                 .toList();
 
         if (activeCarts.isEmpty()) {
             return ResponseEntity.badRequest().body("No active cart found for checkout.");
         }
 
-        Cart cart = activeCarts.get(0);
-        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
+        // 1b. Among all active carts, find the one that actually has items.
+        //     (There may be stale empty carts left from previous sessions.)
+        Cart cart = null;
+        List<CartItem> cartItems = new ArrayList<>();
 
-        if (cartItems.isEmpty()) {
-            return ResponseEntity.badRequest().body("Cart is empty.");
+        for (Cart activeCart : activeCarts) {
+            List<CartItem> items = cartItemRepository.findByCartId(activeCart.getId());
+            if (!items.isEmpty()) {
+                cart = activeCart;
+                cartItems = items;
+            } else {
+                // Clean up stale empty carts so this doesn't pile up
+                cartRepository.delete(activeCart);
+            }
+        }
+
+        if (cart == null || cartItems.isEmpty()) {
+            return ResponseEntity.badRequest().body("Cart is empty. Please add items before checking out.");
         }
 
         // 2. Calculate Total Amount
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (CartItem item : cartItems) {
-            BigDecimal itemTotal = BigDecimal.valueOf(item.getFoodItem().getPrice()).multiply(BigDecimal.valueOf(item.getQuantity()));
+            BigDecimal itemTotal = item.getFoodItem().getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             totalAmount = totalAmount.add(itemTotal);
         }
 
@@ -66,7 +80,7 @@ public class TransactionController {
         newOrder.setUser(cart.getBuyer());
         newOrder.setTotalAmount(totalAmount);
         newOrder.setStatus("COMPLETED"); 
-        newOrder.setShippingAddress("Pick-up at Store"); // Default for now
+        newOrder.setShippingAddress("Pick-up at Store"); 
         newOrder = orderRepository.save(newOrder);
 
         // 4. Move Cart Items to permanent Order Items
@@ -74,8 +88,8 @@ public class TransactionController {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(newOrder);
             orderItem.setFoodItem(cartItem.getFoodItem());
-            orderItem.setProductName(cartItem.getFoodItem().getName()); // Snapshot of the name
-            orderItem.setPrice(BigDecimal.valueOf(cartItem.getFoodItem().getPrice())); // Snapshot of the price
+            orderItem.setProductName(cartItem.getFoodItem().getName());
+            orderItem.setPrice(cartItem.getFoodItem().getPrice()); // already a BigDecimal
             orderItem.setQuantity(cartItem.getQuantity());
             orderItemRepository.save(orderItem);
         }
@@ -85,18 +99,19 @@ public class TransactionController {
         payment.setOrder(newOrder);
         payment.setAmount(totalAmount);
         payment.setStatus("SUCCESS");
-        
-        if (paymentMethod.equals("STRIPE")) {
-            payment.setStripePaymentId("mock_stripe_test_" + UUID.randomUUID().toString().substring(0, 8));
-        } else {
-            payment.setStripePaymentId("CASH_ON_DELIVERY");
-        }
+        payment.setStripePaymentId(paymentMethod.equals("STRIPE") ? "mock_stripe_" + UUID.randomUUID().toString().substring(0, 8) : "CASH_ON_DELIVERY");
         paymentRepository.save(payment);
 
-        // 6. Clear the Cart!
-        cartItemRepository.deleteAll(cartItems);
+        // 6. Clear the Cart safely!
+        // DO NOT delete items manually. Let Hibernate cascade the delete automatically, or it crashes!
         cartRepository.delete(cart);
 
-        return ResponseEntity.ok(newOrder);
+        // 7. Return EXACTLY what Android expects to stop JSON infinite loop crashes!
+        return ResponseEntity.ok(Map.of(
+                "id", newOrder.getId(),
+                "orderNumber", newOrder.getOrderNumber(),
+                "totalAmount", newOrder.getTotalAmount(),
+                "status", newOrder.getStatus()
+        ));
     }
 }
