@@ -36,8 +36,7 @@ class DashboardActivity : AppCompatActivity() {
 
         rvFoodItems = findViewById(R.id.rvFoodItems)
         val btnProfileToggle = findViewById<CardView>(R.id.btnProfileToggle)
-        val cvDropdownMenu   = findViewById<CardView>(R.id.cvDropdownMenu)
-        val btnMenuLogout    = findViewById<TextView>(R.id.btnMenuLogout)
+        
 
         rvFoodItems.layoutManager = LinearLayoutManager(this)
         foodAdapter = FoodAdapter(emptyList()) { foodItem -> addToCart(foodItem) }
@@ -63,23 +62,15 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, OrderHistoryActivity::class.java))
         }
 
-        // Profile — placeholder toast for now
+        // Profile
+        val profileIntent = Intent(this, com.example.orderflowmobile.profile.ProfileActivity::class.java)
         findViewById<LinearLayout>(R.id.navProfile).setOnClickListener {
-            Toast.makeText(this, "Profile coming soon!", Toast.LENGTH_SHORT).show()
+            startActivity(profileIntent)
         }
 
-        // ── Profile dropdown ──────────────────────────────────────────────────
+        // Header Profile Button
         btnProfileToggle.setOnClickListener {
-            cvDropdownMenu.visibility =
-                if (cvDropdownMenu.visibility == View.GONE) View.VISIBLE else View.GONE
-        }
-
-        btnMenuLogout.setOnClickListener {
-            cvDropdownMenu.visibility = View.GONE
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+            startActivity(profileIntent)
         }
     }
 
@@ -191,3 +182,4 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 }
+

@@ -219,37 +219,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- ── Dropdown menu (profile top-right) ── -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvDropdownMenu"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="10dp"
-        android:layout_gravity="end|top"
-        android:layout_marginTop="80dp"
-        android:layout_marginEnd="20dp"
-        android:visibility="gone">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#FFFFFF">
-
-            <TextView
-                android:id="@+id/btnMenuLogout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Log Out"
-                android:textColor="#D32F2F"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:padding="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
 
 </LinearLayout>
