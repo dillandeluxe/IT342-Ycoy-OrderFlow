@@ -58,6 +58,8 @@ class FoodAdapter(
             holder.ivFoodImage.setImageResource(R.drawable.ic_launcher_background)
         }
 
+        if (item.stock <= 0) { holder.btnAddToCart.isEnabled = false; holder.btnAddToCart.text = "Sold Out" } else { holder.btnAddToCart.isEnabled = true; holder.btnAddToCart.text = "Add to Cart" }
+
         holder.btnViewFood.setOnClickListener {
             val intent = Intent(context, FoodDetailActivity::class.java).apply {
                 putExtra("NAME", item.name)
@@ -65,6 +67,7 @@ class FoodAdapter(
                 putExtra("DESC", item.description)
                 putExtra("SELLER", restaurantName)
                 putExtra("IMAGE_URL", item.imageUrl)
+                putExtra("STOCK", item.stock)
             }
             context.startActivity(intent)
         }
@@ -82,3 +85,4 @@ class FoodAdapter(
         notifyDataSetChanged()
     }
 }
+
