@@ -93,7 +93,7 @@ const FoodCard = ({ item, getRestaurantName, formatPeso, onViewProduct }) => {
     const isSoldOut = item.stock === 0;
     const bgImage = item.imageUrl && item.imageUrl.trim() !== "" 
         ? item.imageUrl 
-        : 'https://placehold.co/600x400/F3F4F6/9CA3AF?text=Image+Coming+Soon&font=Montserrat'; // Generic placeholder for future image uploads
+        : 'https://placehold.co/600x400/F3F4F6/9CA3AF?text=Image+Coming+Soon&font=Montserrat';
 
     return (
         <div className={`food-card ${isSoldOut ? 'sold-out' : ''}`}>
