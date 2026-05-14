@@ -14,8 +14,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.orderflowmobile.R
-import com.example.orderflowmobile.core.ApiClient
 import com.example.orderflowmobile.auth.LoginActivity
+import com.example.orderflowmobile.cart.CartActivity
+import com.example.orderflowmobile.core.ApiClient
+import com.example.orderflowmobile.core.SharedPreferencesManager
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,11 +39,19 @@ class DashboardActivity : AppCompatActivity() {
         val btnMenuLogout = findViewById<TextView>(R.id.btnMenuLogout)
 
         rvFoodItems.layoutManager = LinearLayoutManager(this)
-        foodAdapter = FoodAdapter(emptyList())
+        foodAdapter = FoodAdapter(emptyList()) { foodItem ->
+            addToCart(foodItem)
+        }
         rvFoodItems.adapter = foodAdapter
 
         setupCategoryTabs()
         fetchFoodItems()
+
+        val fabCart = findViewById<ExtendedFloatingActionButton>(R.id.fabCart)
+        fabCart.setOnClickListener {
+            val intent = Intent(this, CartActivity::class.java)
+            startActivity(intent)
+        }
 
         // NEW: Toggle the dropdown menu visibility
         btnProfileToggle.setOnClickListener {
@@ -74,7 +85,7 @@ class DashboardActivity : AppCompatActivity() {
 
                 // Initial styling (Only "All" is blue at first)
                 if (category == "All") {
-                    setBackgroundColor(Color.parseColor("#1A73E8"))
+                    setBackgroundColor(Color.parseColor("#E63946"))
                     setTextColor(Color.WHITE)
                 } else {
                     setBackgroundColor(Color.parseColor("#FFFFFF"))
@@ -103,7 +114,7 @@ class DashboardActivity : AppCompatActivity() {
             if (btn != null) {
                 if (btn.text.toString() == activeCategory) {
                     // Highlight the clicked tab
-                    btn.setBackgroundColor(Color.parseColor("#1A73E8"))
+                    btn.setBackgroundColor(Color.parseColor("#E63946"))
                     btn.setTextColor(Color.WHITE)
                 } else {
                     // Reset all other tabs to white
@@ -140,6 +151,32 @@ class DashboardActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@DashboardActivity, "Error connecting to server", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun addToCart(foodItem: FoodItem) {
+        val userId = SharedPreferencesManager.userId
+        if (userId == -1L) {
+            Toast.makeText(this, "Please log in first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val response = ApiClient.cartService.addToCart(userId, foodItem.id)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@DashboardActivity, "${foodItem.name} added to cart!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@DashboardActivity, "Failed to add to cart: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    e.printStackTrace()
+                    Toast.makeText(this@DashboardActivity, "Network Error: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }

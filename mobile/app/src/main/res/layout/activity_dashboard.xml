@@ -27,7 +27,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="OrderFlow"
-                    android:textColor="#1A73E8"
+                    android:textColor="#E63946"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -47,7 +47,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="#1A73E8"
+                app:cardBackgroundColor="#E63946"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground">
@@ -119,5 +119,17 @@
                 android:focusable="true"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabCart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="24dp"
+        android:text="View Cart"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:backgroundTint="#E63946" />
 
 </RelativeLayout>

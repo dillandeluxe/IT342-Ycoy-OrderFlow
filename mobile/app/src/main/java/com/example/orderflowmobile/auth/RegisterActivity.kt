@@ -20,6 +20,10 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        val registerCardView = findViewById<android.view.View>(R.id.registerCardView)
+        val animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fade_in_up)
+        registerCardView.startAnimation(animation)
+
         val etFullName = findViewById<EditText>(R.id.etFullName)
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)

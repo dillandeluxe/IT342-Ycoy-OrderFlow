@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.orderflowmobile.menu.DashboardActivity
 import com.example.orderflowmobile.R
 import com.example.orderflowmobile.core.ApiClient
+import com.example.orderflowmobile.core.SharedPreferencesManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,6 +21,13 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        // Initialize SharedPreferences helper
+        SharedPreferencesManager.init(this)
+
+        val loginCardView = findViewById<android.view.View>(R.id.loginCardView)
+        val animation = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fade_in_up)
+        loginCardView.startAnimation(animation)
 
         val etEmail = findViewById<EditText>(R.id.etLoginEmail)
         val etPassword = findViewById<EditText>(R.id.etLoginPassword)
@@ -68,6 +76,11 @@ class LoginActivity : AppCompatActivity() {
                                 tvMessage.setTextColor(android.graphics.Color.RED)
                                 return@withContext // Stops the code here, preventing them from entering!
                             }
+
+                            // Save session data
+                            SharedPreferencesManager.userId = loginData.id
+                            SharedPreferencesManager.token = loginData.token ?: ""
+                            SharedPreferencesManager.email = email
 
                             // If they are a BUYER, proceed normally
                             tvMessage.text = "Login Successful!"

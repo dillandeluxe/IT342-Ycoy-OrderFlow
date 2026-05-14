@@ -35,36 +35,41 @@ public class CartController {
     }
 
     @PostMapping("/{buyerId}/add/{foodItemId}")
-    public ResponseEntity<CartItem> addToCart(@PathVariable Long buyerId, @PathVariable Long foodItemId) {
-        User buyer = userRepository.findById(buyerId).orElseThrow();
-        FoodItem food = foodItemRepository.findById(foodItemId).orElseThrow();
-        User seller = food.getSeller();
+    public ResponseEntity<?> addToCart(@PathVariable Long buyerId, @PathVariable Long foodItemId) {
+        try {
+            User buyer = userRepository.findById(buyerId).orElseThrow(() -> new RuntimeException("Buyer not found"));
+            FoodItem food = foodItemRepository.findById(foodItemId).orElseThrow(() -> new RuntimeException("Food not found"));
+            User seller = food.getSeller();
 
-        // 1. Find the Cart, or make a new one
-        Cart cart = cartRepository.findByBuyerIdAndSellerIdAndStatus(buyerId, seller.getId(), "active")
-                .orElseGet(() -> {
-                    Cart newCart = new Cart();
-                    newCart.setBuyer(buyer);
-                    newCart.setSeller(seller);
-                    newCart.setStatus("active");
-                    return cartRepository.save(newCart);
-                });
+            // 1. Find the Cart, or make a new one
+            Cart cart = cartRepository.findByBuyerIdAndSellerIdAndStatus(buyerId, seller.getId(), "active")
+                    .orElseGet(() -> {
+                        Cart newCart = new Cart();
+                        newCart.setBuyer(buyer);
+                        newCart.setSeller(seller);
+                        newCart.setStatus("active");
+                        return cartRepository.save(newCart);
+                    });
 
-        // 2. Add item to the Cart
-        Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndFoodItemId(cart.getId(), foodItemId);
+            // 2. Add item to the Cart
+            Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndFoodItemId(cart.getId(), foodItemId);
 
-        if (existingItem.isPresent()) {
-            CartItem item = existingItem.get();
-            item.setQuantity(item.getQuantity() + 1);
-            return ResponseEntity.ok(cartItemRepository.save(item));
+            if (existingItem.isPresent()) {
+                CartItem item = existingItem.get();
+                item.setQuantity(item.getQuantity() + 1);
+                return ResponseEntity.ok(cartItemRepository.save(item));
+            }
+
+            CartItem newItem = new CartItem();
+            newItem.setCart(cart); // <-- THIS is what fixes the error!
+            newItem.setFoodItem(food);
+            newItem.setQuantity(1);
+
+            return ResponseEntity.ok(cartItemRepository.save(newItem));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
-
-        CartItem newItem = new CartItem();
-        newItem.setCart(cart); // <-- THIS is what fixes the error!
-        newItem.setFoodItem(food);
-        newItem.setQuantity(1);
-
-        return ResponseEntity.ok(cartItemRepository.save(newItem));
     }
 
     @DeleteMapping("/{cartItemId}")

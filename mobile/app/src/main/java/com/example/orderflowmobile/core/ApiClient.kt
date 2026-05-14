@@ -3,6 +3,7 @@ package com.example.orderflowmobile.core
 
 import com.example.orderflowmobile.menu.FoodApi
 import com.example.orderflowmobile.auth.AuthApi
+import com.example.orderflowmobile.cart.CartApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -24,5 +25,14 @@ object ApiClient {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(FoodApi::class.java)
+    }
+
+    // NEW: Cart service for cart operations
+    val cartService: CartApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(CartApi::class.java)
     }
 }

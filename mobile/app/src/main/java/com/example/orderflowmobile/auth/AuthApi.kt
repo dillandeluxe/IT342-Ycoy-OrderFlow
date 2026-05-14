@@ -19,9 +19,9 @@ data class AuthResponse(val message: String?, val error: String?)
 // NEW: Used specifically for Login to catch the token and role!
 data class LoginResponse(
     val message: String,
-    val token: String,
+    val token: String?,
     val role: String,
-    val userId: Long,
+    val id: Long, // Changed from userId to id to match Spring Boot output!
     val restaurantName: String?
 )
 

@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/food/**").permitAll()
                 .requestMatchers("/api/cart/**").permitAll() // FIX: Open cart routes
+                .requestMatchers("/error").permitAll() // FIX: Allow error route so it doesn't redirect loop on 500s
                 // Removed the manual OAuth2 matchers here so Spring handles them automatically!
                 .anyRequest().authenticated()
             )

@@ -18,6 +18,8 @@
         <activity
             android:name=".menu.DashboardActivity"
             android:exported="false" />
+        <activity android:name=".cart.CartActivity"
+            android:exported="false" />
         <activity android:name=".menu.FoodDetailActivity"
             android:exported="false" />
         <activity

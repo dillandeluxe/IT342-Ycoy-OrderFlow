@@ -9,8 +9,17 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.orderflowmobile.R
+import com.example.orderflowmobile.core.ApiClient
+import com.example.orderflowmobile.core.SharedPreferencesManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class FoodAdapter(private var foodList: List<FoodItem>) : RecyclerView.Adapter<FoodAdapter.FoodViewHolder>() {
+class FoodAdapter(
+    private var foodList: List<FoodItem>,
+    private val onAddToCart: (FoodItem) -> Unit
+) : RecyclerView.Adapter<FoodAdapter.FoodViewHolder>() {
 
     class FoodViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvSellerName: TextView = itemView.findViewById(R.id.tvSellerName)
@@ -29,7 +38,6 @@ class FoodAdapter(private var foodList: List<FoodItem>) : RecyclerView.Adapter<F
     override fun onBindViewHolder(holder: FoodViewHolder, position: Int) {
         val item = foodList[position]
         val context = holder.itemView.context
-
         val restaurantName = item.seller?.restaurantName ?: item.seller?.fullName ?: "SELLER"
 
         holder.tvSellerName.text = restaurantName.uppercase()
@@ -37,7 +45,6 @@ class FoodAdapter(private var foodList: List<FoodItem>) : RecyclerView.Adapter<F
         holder.tvFoodPrice.text = String.format("₱%.2f", item.price)
         holder.tvFoodDesc.text = item.description
 
-        // NEW: View Button Logic (Navigate to Detail Screen)
         holder.btnViewFood.setOnClickListener {
             val intent = Intent(context, FoodDetailActivity::class.java).apply {
                 putExtra("NAME", item.name)
@@ -48,9 +55,9 @@ class FoodAdapter(private var foodList: List<FoodItem>) : RecyclerView.Adapter<F
             context.startActivity(intent)
         }
 
-        // NEW: Add to Cart Logic
         holder.btnAddToCart.setOnClickListener {
-            Toast.makeText(context, "${item.name} added to cart (Phase 5)", Toast.LENGTH_SHORT).show()
+            // Use the provided callback to handle adding to cart
+            onAddToCart(item)
         }
     }
 
@@ -60,4 +67,4 @@ class FoodAdapter(private var foodList: List<FoodItem>) : RecyclerView.Adapter<F
         foodList = newList
         notifyDataSetChanged()
     }
-}
+}
