@@ -1,0 +1,102 @@
+package edu.cit.ycoy.orderflow.transaction;
+
+import edu.cit.ycoy.orderflow.cart.Cart;
+import edu.cit.ycoy.orderflow.cart.CartItem;
+import edu.cit.ycoy.orderflow.cart.CartRepository;
+import edu.cit.ycoy.orderflow.cart.CartItemRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/transactions")
+@CrossOrigin(origins = "*")
+public class TransactionController {
+
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final PaymentRepository paymentRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+
+    public TransactionController(OrderRepository orderRepository, OrderItemRepository orderItemRepository, PaymentRepository paymentRepository, CartRepository cartRepository, CartItemRepository cartItemRepository) {
+        this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.paymentRepository = paymentRepository;
+        this.cartRepository = cartRepository;
+        this.cartItemRepository = cartItemRepository;
+    }
+
+    // The @Transactional tag ensures that if the payment fails, the cart is NOT deleted!
+    @PostMapping("/checkout/{buyerId}")
+    @Transactional 
+    public ResponseEntity<?> processCheckout(@PathVariable Long buyerId, @RequestParam(defaultValue = "CASH") String paymentMethod) {
+        
+        // 1. Find the user's active cart (Assuming seller ID is 1 for now, or you can loop through multiple carts)
+        // For simplicity, let's grab the first active cart for this buyer
+        List<Cart> activeCarts = cartRepository.findAll().stream()
+                .filter(c -> c.getBuyer().getId().equals(buyerId) && c.getStatus().equals("active"))
+                .toList();
+
+        if (activeCarts.isEmpty()) {
+            return ResponseEntity.badRequest().body("No active cart found for checkout.");
+        }
+
+        Cart cart = activeCarts.get(0);
+        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
+
+        if (cartItems.isEmpty()) {
+            return ResponseEntity.badRequest().body("Cart is empty.");
+        }
+
+        // 2. Calculate Total Amount
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (CartItem item : cartItems) {
+            BigDecimal itemTotal = BigDecimal.valueOf(item.getFoodItem().getPrice()).multiply(BigDecimal.valueOf(item.getQuantity()));
+            totalAmount = totalAmount.add(itemTotal);
+        }
+
+        // 3. Create the Order Header
+        Order newOrder = new Order();
+        newOrder.setOrderNumber("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        newOrder.setUser(cart.getBuyer());
+        newOrder.setTotalAmount(totalAmount);
+        newOrder.setStatus("COMPLETED"); 
+        newOrder.setShippingAddress("Pick-up at Store"); // Default for now
+        newOrder = orderRepository.save(newOrder);
+
+        // 4. Move Cart Items to permanent Order Items
+        for (CartItem cartItem : cartItems) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(newOrder);
+            orderItem.setFoodItem(cartItem.getFoodItem());
+            orderItem.setProductName(cartItem.getFoodItem().getName()); // Snapshot of the name
+            orderItem.setPrice(BigDecimal.valueOf(cartItem.getFoodItem().getPrice())); // Snapshot of the price
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItemRepository.save(orderItem);
+        }
+
+        // 5. Create the Mock Payment
+        Payment payment = new Payment();
+        payment.setOrder(newOrder);
+        payment.setAmount(totalAmount);
+        payment.setStatus("SUCCESS");
+        
+        if (paymentMethod.equals("STRIPE")) {
+            payment.setStripePaymentId("mock_stripe_test_" + UUID.randomUUID().toString().substring(0, 8));
+        } else {
+            payment.setStripePaymentId("CASH_ON_DELIVERY");
+        }
+        paymentRepository.save(payment);
+
+        // 6. Clear the Cart!
+        cartItemRepository.deleteAll(cartItems);
+        cartRepository.delete(cart);
+
+        return ResponseEntity.ok(newOrder);
+    }
+}
