@@ -33,6 +33,11 @@ class CartActivity : AppCompatActivity() {
         tvTotalPrice = findViewById(R.id.tvTotalPrice)
         btnCheckout = findViewById(R.id.btnCheckout)
 
+        val btnBack: android.widget.ImageButton = findViewById(R.id.btnBack)
+        btnBack.setOnClickListener {
+            finish()
+        }
+
         rvCartItems.layoutManager = LinearLayoutManager(this)
         cartAdapter = CartAdapter(cartItems) { item ->
             removeFromCart(item)
