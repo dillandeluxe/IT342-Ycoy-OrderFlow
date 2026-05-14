@@ -18,6 +18,7 @@ import com.example.orderflowmobile.auth.LoginActivity
 import com.example.orderflowmobile.cart.CartActivity
 import com.example.orderflowmobile.core.ApiClient
 import com.example.orderflowmobile.core.SharedPreferencesManager
+import com.example.orderflowmobile.core.SnackbarUtils
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -168,15 +169,26 @@ class DashboardActivity : AppCompatActivity() {
                 val response = ApiClient.cartService.addToCart(userId, foodItem.id)
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@DashboardActivity, "${foodItem.name} added to cart!", Toast.LENGTH_SHORT).show()
+                        SnackbarUtils.showSuccess(
+                            this@DashboardActivity,
+                            "Added to Cart!",
+                            "${foodItem.name} is in your cart"
+                        )
                     } else {
-                        Toast.makeText(this@DashboardActivity, "Failed to add to cart: ${response.code()}", Toast.LENGTH_SHORT).show()
+                        SnackbarUtils.showError(
+                            this@DashboardActivity,
+                            "Could not add item",
+                            "Server error ${response.code()}"
+                        )
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    e.printStackTrace()
-                    Toast.makeText(this@DashboardActivity, "Network Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    SnackbarUtils.showError(
+                        this@DashboardActivity,
+                        "Network Error",
+                        e.message ?: "Could not connect to server"
+                    )
                 }
             }
         }

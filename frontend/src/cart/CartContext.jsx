@@ -7,6 +7,7 @@ const CartContext = createContext();
 // 2. Create the Provider Component
 export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
 
     const fetchCart = async (buyerId) => {
         try {
@@ -27,7 +28,7 @@ export const CartProvider = ({ children }) => {
 
     // Fetch initial cart setup if logged in
     useEffect(() => {
-        const userId = localStorage.getItem('userId') || 1; 
+        const userId = localStorage.getItem('userId') || 1;
         fetchCart(userId);
     }, []);
 
@@ -37,12 +38,12 @@ export const CartProvider = ({ children }) => {
             const token = localStorage.getItem('token');
             const response = await fetch(`http://localhost:8080/api/cart/${buyerId}/add/${foodItemId}`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 }
             });
-            
+
             if (response.ok) {
                 const newItem = await response.json();
                 console.log("Item added to database cart:", newItem);
@@ -71,7 +72,7 @@ export const CartProvider = ({ children }) => {
 
             if (response.ok) {
                 toast.success("Item removed from cart");
-                const userId = localStorage.getItem('userId') || 1; 
+                const userId = localStorage.getItem('userId') || 1;
                 await fetchCart(userId);
             } else {
                 toast.error("Failed to remove item.");
@@ -82,8 +83,50 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    // NEW: Full checkout function
+    const checkout = async (paymentMethod = 'CASH') => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            toast.error("Please log in to checkout.");
+            return { success: false };
+        }
+
+        setIsCheckingOut(true);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(
+                `http://localhost:8080/api/transactions/checkout/${userId}?paymentMethod=${paymentMethod}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Clear cart in UI
+                setCartItems([]);
+                return { success: true, orderNumber: data.orderNumber, totalAmount: data.totalAmount };
+            } else {
+                const errorMsg = typeof data === 'string' ? data : (data.message || 'Checkout failed. Please try again.');
+                toast.error(errorMsg);
+                return { success: false, error: errorMsg };
+            }
+        } catch (error) {
+            console.error("Checkout error:", error);
+            toast.error("Network error during checkout.");
+            return { success: false, error: error.message };
+        } finally {
+            setIsCheckingOut(false);
+        }
+    };
+
     return (
-        <CartContext.Provider value={{ cartItems, addToCart, fetchCart, removeFromCart }}>
+        <CartContext.Provider value={{ cartItems, addToCart, fetchCart, removeFromCart, checkout, isCheckingOut }}>
             {children}
         </CartContext.Provider>
     );

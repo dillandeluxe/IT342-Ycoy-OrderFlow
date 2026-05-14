@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.orderflowmobile.R
 import com.example.orderflowmobile.core.ApiClient
 import com.example.orderflowmobile.core.SharedPreferencesManager
+import com.example.orderflowmobile.core.SnackbarUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,7 +81,11 @@ class CartActivity : AppCompatActivity() {
                             withContext(Dispatchers.Main) {
                                 if (response.isSuccessful && response.body() != null) {
                                     val orderNumber = response.body()!!.orderNumber
-                                    Toast.makeText(this@CartActivity, "Success! Receipt: $orderNumber", Toast.LENGTH_LONG).show()
+                                    SnackbarUtils.showSuccess(
+                                        this@CartActivity,
+                                        "Order Placed! 🎉",
+                                        "Receipt: $orderNumber"
+                                    )
 
                                     // Reload cart (it will be empty now)
                                     loadCart()
