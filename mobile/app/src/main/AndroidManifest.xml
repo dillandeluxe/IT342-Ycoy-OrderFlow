@@ -23,6 +23,9 @@
         <activity android:name=".menu.FoodDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".transaction.OrderHistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".auth.LoginActivity"
             android:exported="true" >
             <intent-filter>

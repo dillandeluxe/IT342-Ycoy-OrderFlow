@@ -121,6 +121,36 @@ public class TransactionController {
         ));
     }
 
+    // ── GET /buyer/{buyerId} — buyer's own order history ──────────────────────
+    @GetMapping("/buyer/{buyerId}")
+    public ResponseEntity<?> getOrdersByBuyer(@PathVariable Long buyerId) {
+        List<Order> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(buyerId);
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Order order : orders) {
+            List<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
+
+            List<Map<String, Object>> itemDtos = items.stream().map(oi -> Map.<String, Object>of(
+                    "productName", oi.getProductName(),
+                    "quantity",    oi.getQuantity(),
+                    "price",       oi.getPrice()
+            )).toList();
+
+            result.add(Map.of(
+                    "id",             order.getId(),
+                    "orderNumber",    order.getOrderNumber(),
+                    "totalAmount",    order.getTotalAmount(),
+                    "status",         order.getStatus(),
+                    "shippingAddress", order.getShippingAddress() != null
+                                        ? order.getShippingAddress() : "Pick-up at Store",
+                    "createdAt",      order.getCreatedAt() != null
+                                        ? order.getCreatedAt().toString() : "",
+                    "orderItems",     itemDtos
+            ));
+        }
+        return ResponseEntity.ok(result);
+    }
+
     // ── GET /seller/{sellerId} — all orders that contain this seller's items ──
     @GetMapping("/seller/{sellerId}")
     public ResponseEntity<?> getOrdersBySeller(@PathVariable Long sellerId) {

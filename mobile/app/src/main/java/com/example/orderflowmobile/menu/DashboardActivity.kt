@@ -19,7 +19,7 @@ import com.example.orderflowmobile.cart.CartActivity
 import com.example.orderflowmobile.core.ApiClient
 import com.example.orderflowmobile.core.SharedPreferencesManager
 import com.example.orderflowmobile.core.SnackbarUtils
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.example.orderflowmobile.transaction.OrderHistoryActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,37 +36,46 @@ class DashboardActivity : AppCompatActivity() {
 
         rvFoodItems = findViewById(R.id.rvFoodItems)
         val btnProfileToggle = findViewById<CardView>(R.id.btnProfileToggle)
-        val cvDropdownMenu = findViewById<CardView>(R.id.cvDropdownMenu)
-        val btnMenuLogout = findViewById<TextView>(R.id.btnMenuLogout)
+        val cvDropdownMenu   = findViewById<CardView>(R.id.cvDropdownMenu)
+        val btnMenuLogout    = findViewById<TextView>(R.id.btnMenuLogout)
 
         rvFoodItems.layoutManager = LinearLayoutManager(this)
-        foodAdapter = FoodAdapter(emptyList()) { foodItem ->
-            addToCart(foodItem)
-        }
+        foodAdapter = FoodAdapter(emptyList()) { foodItem -> addToCart(foodItem) }
         rvFoodItems.adapter = foodAdapter
 
         setupCategoryTabs()
         fetchFoodItems()
 
-        val fabCart = findViewById<ExtendedFloatingActionButton>(R.id.fabCart)
-        fabCart.setOnClickListener {
-            val intent = Intent(this, CartActivity::class.java)
-            startActivity(intent)
+        // ── Bottom Nav ────────────────────────────────────────────────────────
+
+        // Search — scrolls food list back to top & focuses list
+        findViewById<LinearLayout>(R.id.navSearch).setOnClickListener {
+            rvFoodItems.smoothScrollToPosition(0)
         }
 
-        // NEW: Toggle the dropdown menu visibility
+        // Cart
+        findViewById<LinearLayout>(R.id.navCart).setOnClickListener {
+            startActivity(Intent(this, CartActivity::class.java))
+        }
+
+        // Orders — go to order history
+        findViewById<LinearLayout>(R.id.navOrders).setOnClickListener {
+            startActivity(Intent(this, OrderHistoryActivity::class.java))
+        }
+
+        // Profile — placeholder toast for now
+        findViewById<LinearLayout>(R.id.navProfile).setOnClickListener {
+            Toast.makeText(this, "Profile coming soon!", Toast.LENGTH_SHORT).show()
+        }
+
+        // ── Profile dropdown ──────────────────────────────────────────────────
         btnProfileToggle.setOnClickListener {
-            if (cvDropdownMenu.visibility == View.GONE) {
-                cvDropdownMenu.visibility = View.VISIBLE
-            } else {
-                cvDropdownMenu.visibility = View.GONE
-            }
+            cvDropdownMenu.visibility =
+                if (cvDropdownMenu.visibility == View.GONE) View.VISIBLE else View.GONE
         }
 
-        // NEW: The actual logout button inside the card
         btnMenuLogout.setOnClickListener {
-            cvDropdownMenu.visibility = View.GONE // Hide it
-            Toast.makeText(this, "Logging out...", Toast.LENGTH_SHORT).show()
+            cvDropdownMenu.visibility = View.GONE
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -76,15 +85,13 @@ class DashboardActivity : AppCompatActivity() {
 
     private fun setupCategoryTabs() {
         val layoutCategories = findViewById<LinearLayout>(R.id.layoutCategories)
-        layoutCategories.removeAllViews() // Clears old buttons if reloaded
+        layoutCategories.removeAllViews()
         val categories = listOf("All", "Pizza", "Burgers", "Rice Meals", "Drinks", "Desserts")
 
         for (category in categories) {
             val btn = Button(this).apply {
                 text = category
                 isAllCaps = false
-
-                // Initial styling (Only "All" is blue at first)
                 if (category == "All") {
                     setBackgroundColor(Color.parseColor("#E63946"))
                     setTextColor(Color.WHITE)
@@ -92,15 +99,12 @@ class DashboardActivity : AppCompatActivity() {
                     setBackgroundColor(Color.parseColor("#FFFFFF"))
                     setTextColor(Color.parseColor("#64748B"))
                 }
-
                 val params = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
                 params.setMargins(0, 0, 16, 0)
                 layoutParams = params
-
-                // NEW: When clicked, update colors AND filter the menu
                 setOnClickListener {
                     updateTabColors(layoutCategories, category)
                     filterMenu(category)
@@ -109,38 +113,31 @@ class DashboardActivity : AppCompatActivity() {
             layoutCategories.addView(btn)
         }
     }
+
     private fun updateTabColors(layoutCategories: LinearLayout, activeCategory: String) {
         for (i in 0 until layoutCategories.childCount) {
             val btn = layoutCategories.getChildAt(i) as? Button
             if (btn != null) {
                 if (btn.text.toString() == activeCategory) {
-                    // Highlight the clicked tab
                     btn.setBackgroundColor(Color.parseColor("#E63946"))
                     btn.setTextColor(Color.WHITE)
                 } else {
-                    // Reset all other tabs to white
                     btn.setBackgroundColor(Color.parseColor("#FFFFFF"))
                     btn.setTextColor(Color.parseColor("#64748B"))
                 }
             }
         }
-        }
+    }
 
     private fun filterMenu(category: String) {
-        if (category == "All") {
-            foodAdapter.updateData(allFoodItems)
-        } else {
-            val filtered = allFoodItems.filter { it.category == category }
-            foodAdapter.updateData(filtered)
-        }
+        if (category == "All") foodAdapter.updateData(allFoodItems)
+        else foodAdapter.updateData(allFoodItems.filter { it.category == category })
     }
 
     private fun fetchFoodItems() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val token = "Bearer "
-                val response = ApiClient.foodService.getFoodItems(token)
-
+                val response = ApiClient.foodService.getFoodItems("Bearer ")
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful && response.body() != null) {
                         allFoodItems = response.body()!!
